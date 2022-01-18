@@ -48,3 +48,25 @@ app.listen(port,()=>{
     
 
 在终端使用 `npm start`
+
+# 三、项目的基本优化
+
+## 1.读取配置文件
+安装dotenv，读取根目录中的`.env` 文件，将配置文件写在`process.env` 中
+```
+npm  i dotenv
+```
+创建.env文件
+    APP_PORT = 8000
+
+在`src/config/config.default.js`
+
+```
+const dotenv =require('dotenv')
+dotenv.config()
+// console.log(process.env.APP_PORT);
+module.exports = process.env
+```
+改写main.js
+
+    const {APP_PORT} = require('./config/config.default')

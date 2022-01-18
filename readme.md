@@ -117,3 +117,68 @@ app.listen(APP_PORT,()=>{
     console.log('server is running on http://localhost:%s',APP_PORT);
 })
 ```
+
+# 五、目录结构优化
+
+## 1.将http服务和app页面拆分
+
+创建`src/app/index.js`
+```
+// @ts-nocheck
+const Koa = require('koa');
+
+const app = new Koa();
+
+const userRouter = require('../router/user.route')
+
+app.use(userRouter.routes())
+
+
+module.exports = app
+```
+
+改写`main.js`
+```
+// @ts-nocheck
+const {APP_PORT} = require('./config/config.default')
+
+const app = require('./app')
+
+app.listen(APP_PORT,()=>{
+    console.log('server is running on http://localhost:%s',APP_PORT);
+})
+
+```
+
+## 将路由拆分和控制器拆分
+
+路由`user.route.js`：解析URL，分布给控制器对应方法
+
+```
+// @ts-nocheck
+const Router = require('koa-router')
+const router = new Router({prefix:'/user'});
+const {register,login} =require('../controller/user.controller')
+
+//注册接口
+router.post('/register',register)
+
+//登录接口
+router.post('/login',login)
+
+router.post('/login',)
+module.exports = router
+```
+
+控制器`user.controller.js`：处理不同的业务
+```
+class UserController{
+    async register(ctx,next){
+        ctx.body = '用户注册成功'
+    }
+    async login(ctx,next){
+        ctx.body = '用户登录成功'
+    }
+}
+module.exports = new UserController()
+```

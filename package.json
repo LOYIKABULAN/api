@@ -1,5 +1,26 @@
 {
   "dependencies": {
+    "koa": "^2.13.4",
     "mysql": "^2.18.1"
-  }
+  },
+  "name": "api",
+  "description": "npm init -y",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LOYIKABULAN/api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LOYIKABULAN/api/issues"
+  },
+  "homepage": "https://github.com/LOYIKABULAN/api#readme"
 }

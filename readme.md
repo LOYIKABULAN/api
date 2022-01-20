@@ -224,7 +224,7 @@ class UserController{
 module.exports = new UserController()
 ```
 
-## 4.拆分service成
+## 4.拆分service层
 
 service层主要是做数据库处理
 创建`src/service/user.service.js`
@@ -237,3 +237,50 @@ class UserService {
 }
 module.exports = new UserService()
 ```
+
+# 七、数据库操作
+
+sequelize ORM数据库工具
+
+ORM：对象关系映射
+- 数据表映射（对应）一个类
+- 数据表中的数据行对应一个对象
+- 数据表字段对应对象属性
+- 数据表的操作对应对象的方法
+
+## 1. 安装sequelize
+
+    npm i mysql2 sequelize
+
+## 2. 连接数据库
+
+`src/db/seq.js`
+```
+// @ts-nocheck
+const { Sequelize } = require("sequelize");
+const {
+  APP_PORT,
+  MYSQL_HOST,
+  MYSQL_PORT,
+  MYSQL_USER,
+  MYSQL_PWD,
+  MYSQL_DB,
+} = require("../config/config.default");
+const seq = new Sequelize(MYSQL_DB, MYSQL_USER, MYSQL_PWD, {
+  host: MYSQL_HOST,
+  dialect: "mysql" /* 选择 'mysql' | 'mariadb' | 'postgres' | 'mssql' 其一 */,
+});
+//用来测试是否成功连接数据库
+seq
+  .authenticate()
+  .then(() => {
+    console.log("数据库连接成功");
+  })
+  .catch((err) => {
+    console.log("数据库连接失败", err);
+  });
+
+module.exports = seq;
+
+```
+

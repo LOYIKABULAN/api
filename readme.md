@@ -565,38 +565,227 @@ module.exports = {
 
 ```
 
-
 ## 3.错误处理函数
-  ```
-  module.exports = (err,ctx)=>{
-    let status = 500
-    switch(err.code){
-        case '10001':
-            status = 400;
-            break;
-        case '10002':
-            status = 409;
-            break;
-        default: 
-            status = 500;
-    }
-    ctx.status = status;
-    ctx.body = err
+
+```
+module.exports = (err,ctx)=>{
+  let status = 500
+  switch(err.code){
+      case '10001':
+          status = 400;
+          break;
+      case '10002':
+          status = 409;
+          break;
+      default:
+          status = 500;
+  }
+  ctx.status = status;
+  ctx.body = err
 }
 ```
 
 改写 `app/index.js`
+
 ```
 app.on('error',errHandler)
 ```
 
 # 十二、加密
 
-  将密码保存到数据库之前要进行加密处理
-  盐（Salt）[^1]
+将密码保存到数据库之前要进行加密处理
+盐（Salt）[^1]
+
+## 1.安装 bcryptjs
+
+npm install bcryptjs
+
+## 2.编写加密中间件
+
+```
+const cryptPassword = async (ctx, next) => {
+  const { password } = ctx.request.body;
+  const salt = bcrypt.genSaltSync(10);
+  //hash保存的是密文
+  const hash = bcrypt.hashSync(password, salt);
+
+  ctx.request.body.password = hash;
+  await next();
+};
+```
+
+## 3.在 router 中使用
+
+改写`user.router.js`
+
+```
+// @ts-nocheck
+const Router = require('koa-router')
+const router = new Router({prefix:'/user'});
+const {register,login} =require('../controller/user.controller')
+const {userValidator,verifyUser,cryptPassword,verifyLogin} =require('../middleware/user.middleware')
+//注册接口
+router.post('/register',userValidator,verifyUser,cryptPassword,register)
+
+//登录接口
+router.post('/login',userValidator,verifyLogin,login)
+
+router.post('/login',)
+module.exports = router
+
+```
+
+[^1]: 在密码学中，是指通过在密码任意固定位置插入特定的字符串，让散列后的结果和使用原始密码的散列结果不相符，这种过程称之为“加盐”。
+
+# 十三、登录验证
+
+流程：
+
+- 验证格式
+- 验证用户是否存在
+- 验证密码是否匹配
+  改写`src/middleware/user.middleware.js`
+
+```
+// @ts-nocheck
+const { getUserInfo } = require("../service/user.service");
+const bcrypt = require("bcryptjs");
+const {
+  userFormateError,
+  userAlreadyExisted,
+  userNotExist,
+  userLoginError,
+  invalidPassword,
+} = require("../constants/err.type");
+const userValidator = async (ctx, next) => {
+  let { user_name, password } = ctx.request.body;
+  //（1）合法性
+  if (!user_name || !password) {
+    console.error("用户名密码为空", ctx.request.body);
+    ctx.app.emit("error", userFormateError, ctx);
+    return;
+  }
+  await next();
+};
+const verifyUser = async (ctx, next) => {
+  let { user_name } = ctx.request.body;
+  //（2）合理性
+  try {
+    const res = await getUserInfo({ user_name });
+    if (res) {
+      console.error("用户已存在", { user_name }, ctx.request.body);
+      ctx.app.emit("error", userAlreadyExisted, ctx);
+      return;
+    }
+  } catch (error) {
+    console.log(error, "获取用户信息错误");
+    ctx.app.emit("error", userRegisterError, ctx);
+    return;
+  }
+  await next();
+};
+const cryptPassword = async (ctx, next) => {
+  const { password } = ctx.request.body;
+  const salt = bcrypt.genSaltSync(10);
+  //hash保存的是密文
+  const hash = bcrypt.hashSync(password, salt);
+
+  ctx.request.body.password = hash;
+  await next();
+};
+const verifyLogin = async (ctx, next) => {
+  //1.判断用户是否存在（不存在报错）
+  const { user_name, password } = ctx.request.body;
+  try {
+    const res = await getUserInfo({ user_name });
+    if (!res) {
+      console.error('用户不存在',{user_name});
+      ctx.app.emit('error',userNotExist,ctx)
+      return;
+    }
 
 
-## 1.安装`npm install bcryptjs`
+    //2.找到用户后匹配密码是否正确（不匹配报错）
+    if (!bcrypt.compareSync(password,res.password)) {
+      console.error();
+      ctx.app.emit('error',invalidPassword,ctx)
+      return;
+    }
+  } catch (error) {
+    console.error('用户登录错误');
+    ctx.app.emit('error',userLoginError,ctx)
+    return;
+  }
+
+  await next();
+};
+module.exports = {
+  userValidator,
+  verifyUser,
+  cryptPassword,
+  verifyLogin,
+};
+
+```
+
+定义错误类型
+
+```
+module.exports = {
+  userFormateError: {
+    code: "10001",
+    message: "用户名或密码为空",
+    result: "",
+  },
+  userAlreadyExisted: {
+    code: "10002",
+    message: "用户已经存在",
+    result: "",
+  },
+  userRegisterError:{
+    code:'10003',
+    message: '用户注册错误',
+    result:''
+  },
+  userNotExist:{
+    code:'10004',
+    message: '用户不存在',
+    result:''
+  },
+  userLoginError:{
+    code:'10005',
+    message:'用户登录错误',
+    result:''
+  },
+  invalidPassword:{
+    code:'10006',
+    message:'无效的密码',
+    result:''
+  }
+
+};
+
+```
+
+改写路由
+
+```
+// 登录接口
+router.post('/login', userValidator, verifyLogin, login)
+```
 
 
-[^1]:在密码学中，是指通过在密码任意固定位置插入特定的字符串，让散列后的结果和使用原始密码的散列结果不相符，这种过程称之为“加盐”。
+# 十四、用户的认证
+
+登录成功后，给用户颁发一个令牌token，用户在以后的每一次请求中携带token。
+
+jwt：JSON WEB TOKEN
+ - header:头部
+ - payload：载荷
+ - signature：签名
+
+ ## 1.安装jsonwebtoken
+
+    npm i jsonwebtoken
+
+  

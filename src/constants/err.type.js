@@ -28,6 +28,16 @@ module.exports = {
     code:'10006',
     message:'无效的密码',
     result:''
+  },
+  tokenExpiredError:{
+    code:'10101',
+    message:'token失效',
+    result:''
+  },
+  jsonWebTokenError:{
+    code:'10102',
+    message:'token无效',
+    result:''
   }
 
 };

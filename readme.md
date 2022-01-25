@@ -784,8 +784,84 @@ jwt：JSON WEB TOKEN
  - payload：载荷
  - signature：签名
 
- ## 1.安装jsonwebtoken
+## 1.颁发token
+ #### 1.安装jsonwebtoken
 
     npm i jsonwebtoken
 
-  
+#### 2.在控制器中改写login方法
+```
+async login(ctx, next) {
+    const {user_name} = ctx.request.body;
+    //1.获取用户信息（在token的payload中，记录id，user_name,is_admin）
+    try {
+      //从返回结果对象中提出password属性，将剩下的属性放到res新的对象中
+      const {password,...res}  = await getUserInfo({user_name})
+      ctx.body={
+        code:'0',
+        message:'用户登录成功',
+        result:{
+          token:jwt.sign(res,JWT_SECRET,{expiresIn:'1d'})
+        }
+      }
+    } catch (error) {
+      console.error('登录失败',error);
+    }
+  }
+```
+
+#### 3.定义私钥
+在 `.env`中定义
+
+      WT_SECRET = zxd
+
+## 2.用户认证
+
+#### 1.创建auth中间件
+```
+// @ts-ignore
+const jwt = require("jsonwebtoken");
+// @ts-ignore
+const { JWT_SECRET } = require("../config/config.default");
+const { tokenExpiredError,jsonWebTokenError } = require("../constants/err.type");
+const auth = async (ctx, next) => {
+  const { authorization } = ctx.request.header;
+  const token = authorization.replace("Bearer ", "");
+  console.log(token);
+
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    ctx.state.user = user;
+    console.log(ctx.state.user);
+    ctx.body = {
+        code:'0',
+        message:'修改密码成功',
+        result:''
+    }
+  } catch (error) {
+    console.error(error);
+    switch (error.name) {
+      case "TokenExpiredError":
+        console.error("token失效", error);
+        return ctx.app.emit("error", tokenExpiredError, ctx);
+      case "JsonWebTokenError":
+        console.error("token无效", error);
+        return ctx.app.emit("error", jsonWebTokenError, ctx);
+    }
+  }
+
+  await next();
+};
+
+module.exports = {
+  auth,
+};
+
+```
+
+#### 改写router
+```
+router.patch('/',auth)
+
+```
+

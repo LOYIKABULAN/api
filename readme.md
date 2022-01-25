@@ -491,3 +491,112 @@ module.exports = new UserService();
 ```
 
 # 十一、拆分中间件
+
+## 1.拆分中间件
+
+添加`src/middleware/user.middleware.js`
+
+```
+// @ts-nocheck
+const { getUserInfo } = require("../service/user.service");
+const {
+  userFormateError,
+  userAlreadyExisted,
+} = require("../constants/err.type");
+const userValidator = async (ctx, next) => {
+  let { user_name, password } = ctx.request.body;
+  //（1）合法性
+  if (!user_name || !password) {
+    console.error("用户名密码为空", ctx.request.body);
+    ctx.app.emit("error", userFormateError, ctx);
+    return;
+  }
+  await next();
+};
+const verifyUser = async (ctx, next) => {
+  let { user_name } = ctx.request.body;
+  //（2）合理性
+  try {
+    const res = await getUserInfo({ user_name });
+    if (res) {
+      console.error("用户已存在", { user_name }, ctx.request.body);
+      ctx.app.emit("error", userAlreadyExisted, ctx);
+      return;
+    }
+  } catch (error) {
+    console.log(error, "获取用户信息错误");
+    ctx.app.emit("error", userRegisterError, ctx);
+    return;
+  }
+  await next();
+};
+module.exports = {
+  userValidator,
+  verifyUser,
+};
+
+```
+
+## 2.统一错误处理通过
+
+- 在出错的地方使用`ctx.app.emit` 提交错误
+- 在 app 中 app.on 监听
+
+编写统一错误定义文件`app/errHandler.js`
+
+```
+module.exports = {
+  userFormateError: {
+    code: "10001",
+    message: "用户名或密码为空",
+    result: "",
+  },
+  userAlreadyExisted: {
+    code: "10002",
+    message: "用户已经存在",
+    result: "",
+  },
+  userRegisterError:{
+    code:'10003',
+    message: '用户注册错误',
+    result:''
+  },
+};
+
+```
+
+
+## 3.错误处理函数
+  ```
+  module.exports = (err,ctx)=>{
+    let status = 500
+    switch(err.code){
+        case '10001':
+            status = 400;
+            break;
+        case '10002':
+            status = 409;
+            break;
+        default: 
+            status = 500;
+    }
+    ctx.status = status;
+    ctx.body = err
+}
+```
+
+改写 `app/index.js`
+```
+app.on('error',errHandler)
+```
+
+# 十二、加密
+
+  将密码保存到数据库之前要进行加密处理
+  盐（Salt）[^1]
+
+
+## 1.安装`npm install bcryptjs`
+
+
+[^1]:在密码学中，是指通过在密码任意固定位置插入特定的字符串，让散列后的结果和使用原始密码的散列结果不相符，这种过程称之为“加盐”。

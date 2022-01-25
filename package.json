@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^14.2.0",
     "koa": "^2.13.4",
     "koa-body": "^4.2.0",

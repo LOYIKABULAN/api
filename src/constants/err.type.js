@@ -43,6 +43,16 @@ module.exports = {
     code:'10103',
     message:'没有管理员权限',
     result:''
+  },
+  fileUploadError:{
+    code:'10201',
+    message:'图片上传错误',
+    result:''
+  },
+  unSupportFileType:{
+    code:'10202',
+    message:'不支持的文件格式',
+    result:''
   }
 
 };

@@ -6,5 +6,6 @@ const {auth,hadAdminPermission} = require('../middleware/auth.middleware')
 
 const {upload} = require('../controller/goods.controller')
 
-router.post('/upload',auth,hadAdminPermission,upload)
+// router.post('/upload',auth,hadAdminPermission,upload)
+router.post('/upload',upload)
 module.exports = router

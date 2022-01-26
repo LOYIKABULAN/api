@@ -1,6 +1,6 @@
 // @ts-nocheck
 const jwt = require('jsonwebtoken')
-const { createUser, getUserInfo } = require("../service/user.service");
+const { createUser, getUserInfo ,updateById} = require("../service/user.service");
 const {JWT_SECRET} = require ('../config/config.default')
 class UserController {
   async register(ctx, next) {
@@ -41,6 +41,27 @@ class UserController {
     } catch (error) {
       console.error('登录失败',error);
     }
+  }
+  async changePassword(ctx,next){
+    //1.获取数据
+    const id = ctx.state.user.id
+    const password = ctx.request.body.password
+    // console.log(id,password);
+    //2.操作数据库
+    //3.返回结束
+   if (await updateById({id,password})) {
+     ctx.body = {
+       code:0,
+       message:'修改密码成功',
+       result:''
+     }
+   }else{
+    ctx.body = {
+      code:10007,
+      message:'修改密码失败',
+      result:''
+    }
+   }
   }
 }
 module.exports = new UserController();

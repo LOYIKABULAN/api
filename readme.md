@@ -774,22 +774,24 @@ module.exports = {
 router.post('/login', userValidator, verifyLogin, login)
 ```
 
-
 # 十四、用户的认证
 
-登录成功后，给用户颁发一个令牌token，用户在以后的每一次请求中携带token。
+登录成功后，给用户颁发一个令牌 token，用户在以后的每一次请求中携带 token。
 
 jwt：JSON WEB TOKEN
- - header:头部
- - payload：载荷
- - signature：签名
 
-## 1.颁发token
- #### 1.安装jsonwebtoken
+- header:头部
+- payload：载荷
+- signature：签名
+
+## 1.颁发 token
+
+#### 1.安装 jsonwebtoken
 
     npm i jsonwebtoken
 
-#### 2.在控制器中改写login方法
+#### 2.在控制器中改写 login 方法
+
 ```
 async login(ctx, next) {
     const {user_name} = ctx.request.body;
@@ -811,13 +813,15 @@ async login(ctx, next) {
 ```
 
 #### 3.定义私钥
+
 在 `.env`中定义
 
       WT_SECRET = zxd
 
 ## 2.用户认证
 
-#### 1.创建auth中间件
+#### 1.创建 auth 中间件
+
 ```
 // @ts-ignore
 const jwt = require("jsonwebtoken");
@@ -859,9 +863,123 @@ module.exports = {
 
 ```
 
-#### 改写router
+#### 改写 router
+
 ```
 router.patch('/',auth)
 
 ```
 
+# 十五、商品模块
+
+## 1.路由自动加载
+
+##### （1）新建`src/router/index.js`
+
+```
+const fs = require('fs')
+
+const Router =require('koa-router')
+const router = new Router()
+
+fs.readdirSync(__dirname).forEach((file) =>{
+  if (file!== 'index.js') {
+    let r =   require('./'+file)
+    router.use(r.routes())
+  }
+})
+
+module.exports = router
+
+```
+
+##### （2）改写`src/app/index.js`
+
+```
+// @ts-nocheck
+const Koa = require('koa');
+const koaBody = require('koa-body');
+
+const app = new Koa();
+
+
+
+const router = require('../router')
+
+const errHandler = require('./errHandler')
+
+app.use(koaBody())
+
+app.use(router.routes()).use(router.allowedMethods())
+//统一的错误处理
+app.on('error',errHandler)
+
+module.exports = app
+```
+
+## 2.封装管理权限
+
+##### （1）修改 auth.middleware.js
+
+```
+// @ts-ignore
+const jwt = require("jsonwebtoken");
+const {hasNotAdminPermission} =require('../constants/err.type')
+// @ts-ignore
+const { JWT_SECRET } = require("../config/config.default");
+const { tokenExpiredError,jsonWebTokenError } = require("../constants/err.type");
+const auth = async (ctx, next) => {
+  const { authorization } = ctx.request.header;
+  const token = authorization.replace("Bearer ", "");
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    ctx.state.user = user;
+  } catch (error) {
+    console.error(error);
+    switch (error.name) {
+      case "TokenExpiredError":
+        console.error("token失效", error);
+        return ctx.app.emit("error", tokenExpiredError, ctx);
+      case "JsonWebTokenError":
+        console.error("token无效", error);
+        return ctx.app.emit("error", jsonWebTokenError, ctx);
+    }
+  }
+
+  await next();
+};
+
+const hadAdminPermission = async (ctx,next) =>{
+  const {is_admin} = ctx.state.user
+  if (!is_admin) {
+    console.error('该用户没有管理员权限',ctx.state.user);
+    return ctx.app.emit('error',hasNotAdminPermission,ctx)
+  }
+  await next()
+}
+
+module.exports = {
+  auth,
+  hadAdminPermission,
+};
+
+```
+
+##### 2.新增 err.type.js
+
+```
+  hasNotAdminPermission:{
+    code:'10103',
+    message:'没有管理员权限',
+    result:''
+  }
+
+```
+
+##### 3.在 goods.route.js 中使用
+
+```
+router.post('/upload',auth,hadAdminPermission,upload)
+
+
+```

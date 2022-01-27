@@ -21,8 +21,9 @@ app.use(
       //!Ii is not recommend to use relative paths in configuration options
       //?the relative path in the configuration item, not relative to the current file, relative to process.cwd() :The process.cwd() method returns the current working directory of the Node.js process.
       //__dirname The directory name of the current module. This is the same as the path.dirname() of the __filename.
-      uploadDir: path.join(__dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
+      // uploadDir: path.join(__dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
       keepExtensions: true, // {Boolean} Files written to uploadDir will include the extensions of the original files, default false
+      maxFileSize:200*1024*1024,
     },
   })
 );

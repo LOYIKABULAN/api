@@ -983,3 +983,97 @@ router.post('/upload',auth,hadAdminPermission,upload)
 
 
 ```
+
+# 十六、文件上传功能
+
+## 1.在`app/index.js`中使用 koa-body 开启文件上传
+
+```
+app.use(
+  koaBody({
+    multipart: true, //Parse multipart bodies, default false
+    formidable: {
+      // {Object} Options to pass to the formidable multipart parser
+      //!Ii is not recommend to use relative paths in configuration options
+      //?the relative path in the configuration item, not relative to the current file, relative to process.cwd() :The process.cwd() method returns the current working directory of the Node.js process.
+      //__dirname The directory name of the current module. This is the same as the path.dirname() of the __filename.
+      // uploadDir: path.join(__dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
+      keepExtensions: true, // {Boolean} Files written to uploadDir will include the extensions of the original files, default false
+      maxFileSize:200*1024*1024,
+    },
+  })
+);
+```
+
+## 2.新建`src/utils/upload.js`
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+module.exports = {
+  async upload(ctx, next, fileType) {
+    const { file } = ctx.request.files;
+    const fileTypes = fileType;
+    if (file) {
+      if (!fileTypes.includes(file.type)) {
+        return ctx.app.emit("error", unSupportFileType, ctx);
+      }
+      const reader = fs.createReadStream(file.path);
+      let filePath =
+        path.join(__dirname, "../upload") + `/${path.basename(file.path)}`;
+      const upStream = fs.createWriteStream(filePath);
+      reader.pipe(upStream);
+      ctx.body = {
+        code: 0,
+        message: "上传成功",
+        result: {
+          goods_img: path.basename(filePath),
+        },
+      };
+    } else {
+      return ctx.app.emit("error", fileUploadError, ctx);
+    }
+  },
+};
+
+```
+
+## 3.在 controller.js 中改写
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+const {upload} = require('../utils/upload')
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx,next,["image/jpeg", "image/png"])
+  }
+}
+
+module.exports = new GoodController();
+
+```
+
+## 4.在 router 中改写
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+const {upload} = require('../utils/upload')
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx,next,["image/jpeg", "image/png"])
+  }
+}
+
+module.exports = new GoodController();
+
+```

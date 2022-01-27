@@ -4,8 +4,8 @@ const router = new Router({prefix:'/goods'});
 
 const {auth,hadAdminPermission} = require('../middleware/auth.middleware')
 
-const {upload} = require('../controller/goods.controller')
+const {uploadImg} = require('../controller/goods.controller')
 
-// router.post('/upload',auth,hadAdminPermission,upload)
-router.post('/upload',upload)
+router.post('/upload',auth,hadAdminPermission,uploadImg)
+// router.post('/upload',uploadImg)
 module.exports = router

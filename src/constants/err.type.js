@@ -53,6 +53,11 @@ module.exports = {
     code:'10202',
     message:'不支持的文件格式',
     result:''
+  },
+  goodFormatError:{
+    code:'10203',
+    message:'商品上传格式错误',
+    result:''
   }
 
 };

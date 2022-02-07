@@ -1297,4 +1297,28 @@ module.exports = new GoodController();
 
 # 二十、删除商品接口
 
-  
+## 1.硬删除
+
+    1.router
+    router.delete("/:id", auth, hadAdminPermission, remove);
+
+    2.controller
+    async remove(ctx) {
+    await removeGoods (ctx.params.id)
+    ctx.body = {
+      code:0,
+      message:'删除商品成功',
+      result:''
+    }
+    }
+
+    3.
+    async removeGoods(id) {
+    const res = await Goods.destroy({ where: { id } });
+    return res[0] > 0 ? true : false;
+    }
+
+
+## 2.软删除
+
+    

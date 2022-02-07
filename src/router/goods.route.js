@@ -10,6 +10,7 @@ const {
   create,
   update,
   remove,
+  restore,
 } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
 //商品图片上传接口
@@ -29,7 +30,7 @@ router.put("/:id", auth, hadAdminPermission, validator, update);
 
 //软删除接口
 router.post('/:id/off',auth,hadAdminPermission,remove)
-
-
+//商品上架
+router.post('/:id/on',auth,hadAdminPermission,restore)
 
 module.exports = router;

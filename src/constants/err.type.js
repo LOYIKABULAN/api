@@ -79,5 +79,10 @@ module.exports = {
     message:'下架商品失败',
     result:''
   },
+  restoreGoodsError:{
+    code:'10208',
+    message:'上架商品失败',
+    result:''
+  }
 
 };

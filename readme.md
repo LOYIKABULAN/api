@@ -1078,14 +1078,13 @@ module.exports = new GoodController();
 
 ```
 
-
 # 十七、统一参数校验
 
 ## 1.安装`koa-parameter`
- 
-  npm i koa-parameter
 
-## 2.写validator 核验参数格式
+npm i koa-parameter
+
+## 2.写 validator 核验参数格式
 
 ```
 const validator = async (ctx, next) => {
@@ -1109,9 +1108,11 @@ module.exports = {
   validator,
 };
 ```
+
 # 十八、发布商品
 
 ## 1. controller
+
 ```
 // @ts-nocheck
 const {  publishGoodsError} = require("../constants/err.type");
@@ -1143,6 +1144,7 @@ module.exports = new GoodController();
 ```
 
 ## 2.service
+
 ```
 // @ts-nocheck
 const Goods = require('../model/goods.model')
@@ -1190,4 +1192,104 @@ const Goods = seq.define('zd_good',{
 // Goods.sync({force:true});
 
 module.exports = Goods;
+```
+
+# 十九、修改商品
+
+## 1.route
+
+```
+const Router = require("koa-router");
+
+const router = new Router({ prefix: "/goods" });
+
+const { auth, hadAdminPermission } = require("../middleware/auth.middleware");
+
+const { uploadImg, create,update } = require("../controller/goods.controller");
+const { validator } = require("../middleware/goods.middleware");
+//商品图片上传接口
+router.post("/upload", auth, hadAdminPermission, uploadImg);
+// router.post('/upload',uploadImg)
+
+//发布商品接口
+router.post("/", auth, hadAdminPermission, validator,create);
+
+//修改商品接口
+router.put('/:id',auth,hadAdminPermission,validator,update)
+module.exports = router;
+
+```
+
+## 2.service
+
+```// @ts-nocheck
+const Goods = require('../model/goods.model')
+class GoodsService{
+    async createGoods(goods){
+        const res = await Goods.create(goods)
+        return res.dataValues;
+    }
+    async updateGoods(id,goods){
+        const res = await Goods.update(goods,{where:{id}})
+
+        return res[0] > 0 ? true : false
+    }
+}
+
+module.exports = new GoodsService()
+```
+
+## 3. controller
+
+```
+// @ts-nocheck
+const {
+  publishGoodsError,
+  updateGoodsError,
+  invalidGoodsId,
+} = require("../constants/err.type");
+const { upload } = require("../utils/upload");
+const { createGoods ,updateGoods} = require("../service/goods.service");
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx, next, ["image/jpeg", "image/png"]);
+  }
+  async create(ctx) {
+    //之间调用service 的createGoods方法
+    try {
+      const { createdAt, updatedAt, ...res } = await createGoods(
+        ctx.request.body
+      );
+      ctx.body = {
+        code: 0,
+        message: "发布商品成功",
+        result: res,
+      };
+    } catch (error) {
+      console.error("发布商品出错", error);
+      return ctx.app.emit("error", publishGoodsError, ctx);
+    }
+  }
+  async update(ctx) {
+    try {
+      const res = await updateGoods(ctx.params.id, ctx.request.body);
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "修改商品成功",
+          result: "",
+        };
+      } else {
+        return ctx.app.emit("error", invalidGoodsId, ctx);
+      }
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit("error", updateGoodsError, ctx);
+    }
+  }
+}
+
+module.exports = new GoodController();
+
 ```

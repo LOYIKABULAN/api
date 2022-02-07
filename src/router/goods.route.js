@@ -4,7 +4,7 @@ const router = new Router({ prefix: "/goods" });
 
 const { auth, hadAdminPermission } = require("../middleware/auth.middleware");
 
-const { uploadImg, create } = require("../controller/goods.controller");
+const { uploadImg, create,update } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
 //商品图片上传接口
 router.post("/upload", auth, hadAdminPermission, uploadImg);
@@ -13,4 +13,6 @@ router.post("/upload", auth, hadAdminPermission, uploadImg);
 //发布商品接口
 router.post("/", auth, hadAdminPermission, validator,create);
 
+//修改商品接口
+router.put('/:id',auth,hadAdminPermission,validator,update)
 module.exports = router;

@@ -63,6 +63,16 @@ module.exports = {
     code:'10204',
     message:'发布商品失败',
     result:''
+  },
+  updateGoodsError:{
+    code:'10205',
+    message:'修改商品失败',
+    result:''
+  },
+  invalidGoodsId:{
+    code:'10206',
+    message:'修改商品信息不存在',
+    result:''
   }
 
 };

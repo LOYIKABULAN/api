@@ -4,12 +4,14 @@ const {
   updateGoodsError,
   invalidGoodsId,
   deleteGoodsError,
+  restoreGoodsError,
 } = require("../constants/err.type");
 const { upload } = require("../utils/upload");
 const {
   createGoods,
   updateGoods,
   removeGoods,
+  restoreGoods,
 } = require("../service/goods.service");
 class GoodController {
   //upload其实可以作为工具单独工具上传多种文件
@@ -58,14 +60,29 @@ class GoodController {
           message: "下架商品成功",
           result: "",
         };
-       
-      }
-      else{
-      return ctx.app.emit("error", invalidGoodsId, ctx);
+      } else {
+        return ctx.app.emit("error", invalidGoodsId, ctx);
       }
     } catch (error) {
       console.error(error);
       return ctx.app.emit("error", deleteGoodsError, ctx);
+    }
+  }
+  async restore(ctx) {
+    try {
+      const res = await restoreGoods(ctx.params.id);
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "上架商品成功",
+          result: "",
+        };
+      } else {
+        return ctx.app.emit("error", invalidGoodsId, ctx);
+      }
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit("error", restoreGoodsError, ctx);
     }
   }
 }

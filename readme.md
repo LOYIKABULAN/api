@@ -1294,7 +1294,6 @@ module.exports = new GoodController();
 
 ```
 
-
 # 二十、删除商品接口
 
 ## 1.硬删除
@@ -1318,7 +1317,53 @@ module.exports = new GoodController();
     return res[0] > 0 ? true : false;
     }
 
-
 ## 2.软删除
 
-    
+1. //软删除接口
+   router.post('/:id/off',auth,hadAdminPermission,remove)
+   //商品上架
+   router.post('/:id/on',auth,hadAdminPermission,restore)
+2. async remove(ctx) {
+   try {
+   const res = await removeGoods(ctx.params.id);
+   if (res) {
+   ctx.body = {
+   code: 0,
+   message: "下架商品成功",
+   result: "",
+   };
+   } else {
+   return ctx.app.emit("error", invalidGoodsId, ctx);
+   }
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit("error", deleteGoodsError, ctx);
+   }
+   }
+   async restore(ctx) {
+   try {
+   const res = await restoreGoods(ctx.params.id);
+   if (res) {
+   ctx.body = {
+   code: 0,
+   message: "上架商品成功",
+   result: "",
+   };
+   } else {
+   return ctx.app.emit("error", invalidGoodsId, ctx);
+   }
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit("error", restoreGoodsError, ctx);
+   }
+   }
+
+   3. async removeGoods(id) {
+      const res = await Goods.destroy({ where: { id } });
+      // console.log(res);
+      return res > 0 ? true : false;
+      }
+      async restoreGoods(id) {
+      const res = await Goods.restore({ where: { id } });
+      return res > 0 ? true : false;
+      }

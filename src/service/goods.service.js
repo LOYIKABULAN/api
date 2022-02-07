@@ -12,7 +12,8 @@ class GoodsService {
   }
   async removeGoods(id) {
     const res = await Goods.destroy({ where: { id } });
-    return res[0] > 0 ? true : false;
+    // console.log(res);
+    return res > 0 ? true : false;
   }
 }
 

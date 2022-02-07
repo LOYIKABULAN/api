@@ -3,9 +3,14 @@ const {
   publishGoodsError,
   updateGoodsError,
   invalidGoodsId,
+  deleteGoodsError,
 } = require("../constants/err.type");
 const { upload } = require("../utils/upload");
-const { createGoods ,updateGoods ,removeGoods} = require("../service/goods.service");
+const {
+  createGoods,
+  updateGoods,
+  removeGoods,
+} = require("../service/goods.service");
 class GoodController {
   //upload其实可以作为工具单独工具上传多种文件
   async uploadImg(ctx, next) {
@@ -45,11 +50,22 @@ class GoodController {
     }
   }
   async remove(ctx) {
-    await removeGoods (ctx.params.id)
-    ctx.body = {
-      code:0,
-      message:'删除商品成功',
-      result:''
+    try {
+      const res = await removeGoods(ctx.params.id);
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "下架商品成功",
+          result: "",
+        };
+       
+      }
+      else{
+      return ctx.app.emit("error", invalidGoodsId, ctx);
+      }
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit("error", deleteGoodsError, ctx);
     }
   }
 }

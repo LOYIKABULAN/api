@@ -24,7 +24,10 @@ const Goods = seq.define('zd_good',{
         comment:'商品图片的地址'
     },
 
-})
+},{
+    paranoid:true
+}
+)
 
 // ! 创建新表覆盖之前的旧表数据清空
 // Goods.sync({force:true}); 

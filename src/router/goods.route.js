@@ -22,6 +22,14 @@ router.post("/", auth, hadAdminPermission, validator, create);
 //修改商品接口
 router.put("/:id", auth, hadAdminPermission, validator, update);
 
+//?不推荐
 //硬删除接口
-router.delete("/:id", auth, hadAdminPermission, remove);
+// router.delete("/:id", auth, hadAdminPermission, remove);
+
+
+//软删除接口
+router.post('/:id/off',auth,hadAdminPermission,remove)
+
+
+
 module.exports = router;

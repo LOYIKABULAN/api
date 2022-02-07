@@ -11,6 +11,7 @@ const {
   update,
   remove,
   restore,
+  findAll,
 } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
 //商品图片上传接口
@@ -33,4 +34,7 @@ router.post('/:id/off',auth,hadAdminPermission,remove)
 //商品上架
 router.post('/:id/on',auth,hadAdminPermission,restore)
 
+//获取商品列表
+
+router.get('/',findAll)
 module.exports = router;

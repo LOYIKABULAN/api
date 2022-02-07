@@ -1367,3 +1367,54 @@ module.exports = new GoodController();
       const res = await Goods.restore({ where: { id } });
       return res > 0 ? true : false;
       }
+
+# 二十一、商品列表实现
+
+1. //获取商品列表
+   router.get('/',findAll)
+2. async findAll(ctx) {
+   try {
+   // 1.解析 pageNum 和 pageSize
+   const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+   // 2.调用数据处理的相关方法
+   const res = await findGoods(pageNum, pageSize);
+   // 3. 返回结果
+   ctx.body = {
+   code: 0,
+   message: "获取商品列表成功",
+   result: res,
+   };
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit('error',findGoodsParamsError,ctx)
+   }
+   }
+3. async findGoods(pageNum, pageSize) {
+   //1.获取总数
+   // const count = await Goods.count();
+   // console.log(count);
+   //2.获取分页的具体数据
+   // try {
+   // const offset = (pageNum - 1) _ pageSize;
+   // const rows = await Goods.findAll({ offset, limit: pageSize _ 1 });
+   // return {
+   // pageNum,
+   // pageSize,
+   // total:count,
+   // list:rows
+   // }
+   // } catch (error) {
+   // console.error(error);
+   // }
+   const offset = (pageNum - 1) _ pageSize;
+   const { count, rows } = await Goods.findAndCountAll({
+   offset,
+   limit: pageSize _ 1,
+   });
+   return {
+   pageNum,
+   pageSize,
+   total: count,
+   list: rows,
+   };
+   }

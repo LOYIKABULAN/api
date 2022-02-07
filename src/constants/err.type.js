@@ -83,6 +83,11 @@ module.exports = {
     code:'10208',
     message:'上架商品失败',
     result:''
+  },
+  findGoodsParamsError:{
+    code:'10301',
+    message:'查找失败，请检查参数',
+    result:'参数错误'
   }
 
 };

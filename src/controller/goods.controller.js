@@ -5,6 +5,7 @@ const {
   invalidGoodsId,
   deleteGoodsError,
   restoreGoodsError,
+  findGoodsParamsError,
 } = require("../constants/err.type");
 const { upload } = require("../utils/upload");
 const {
@@ -12,6 +13,7 @@ const {
   updateGoods,
   removeGoods,
   restoreGoods,
+  findGoods,
 } = require("../service/goods.service");
 class GoodController {
   //upload其实可以作为工具单独工具上传多种文件
@@ -83,6 +85,23 @@ class GoodController {
     } catch (error) {
       console.error(error);
       return ctx.app.emit("error", restoreGoodsError, ctx);
+    }
+  }
+  async findAll(ctx) {
+    try {
+      // 1.解析pageNum和pageSize
+      const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+      // 2.调用数据处理的相关方法
+      const res = await findGoods(pageNum, pageSize);
+      // 3. 返回结果
+      ctx.body = {
+        code: 0,
+        message: "获取商品列表成功",
+        result: res,
+      };
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit('error',findGoodsParamsError,ctx)
     }
   }
 }

@@ -1293,3 +1293,8 @@ class GoodController {
 module.exports = new GoodController();
 
 ```
+
+
+# 二十、删除商品接口
+
+  

@@ -26,6 +26,7 @@ const Goods = seq.define('zd_good',{
 
 })
 
-// Goods.sync({force:true});
+// ! 创建新表覆盖之前的旧表数据清空
+// Goods.sync({force:true}); 
 
 module.exports = Goods;

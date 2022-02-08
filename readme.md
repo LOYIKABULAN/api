@@ -1546,3 +1546,61 @@ Cart.belongsTo(User, {
 module.exports = Cart;
 
 ```
+# 二十三、获取购物车列表
+
+1. router
+```
+//3.2获取购物车列表
+router.get('/',auth,findAll)
+```
+2. controller
+```
+ async findAll(ctx){
+    //1. 解析请求参数
+    const {pageNum = 1,pageSize=10} = ctx.request.query
+    //2. 操作数据库
+    const res = await findCarts({pageNum,pageSize})
+    //3. 返回结果
+    ctx.body = {
+      code:0,
+      message:'获取购物车列表成功',
+      result:res
+    }
+```
+3. service
+```
+ async findCarts({ pageNum, pageSize }) {
+    const offset = (pageNum - 1) * pageSize;
+    const { count, rows } = await Cart.findAndCountAll({
+      attributes: ["id", "number", "selected"],
+      offset,
+      limit: pageSize * 1,
+      include: {
+        model: Goods,
+        as: "goods_info",
+        attributes: ["id", "goods_name","goods_price",'goods_image'],
+      },
+    });
+    return {
+      pageNum,
+      pageSize,
+      total: count,
+      list: rows,
+    };
+  }
+  ```
+  4. model
+  ```
+  //?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
+// User.hasOne(Cart, {
+//   foreignKey: "user_id",
+// });
+Cart.belongsTo(User, {
+  foreignKey: "user_id",
+});
+//?这种方式也行
+Cart.belongsTo(Goods,{
+  foreignKey:'goods_id',
+  as:"goods_info"
+})
+```

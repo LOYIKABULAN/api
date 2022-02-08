@@ -1418,3 +1418,131 @@ module.exports = new GoodController();
    list: rows,
    };
    }
+# 二十二、添加到购物车接口
+
+1. router
+```
+//1. 导入koa-router
+const Router = require('koa-router')
+
+//中间件
+const {auth} = require('../middleware/auth.middleware')
+const {validator} = require('../middleware/cart.middleware')
+//控制器
+const {add} = require('../controller/cart.controller')
+
+//2. 实例化router对象
+const router = new Router({prefix:'/carts'})
+//3. 编写路由规则
+// 1.添加到购物车，（判断商品是否存在，还未做判断）
+router.post('/',auth,validator,add)
+//3.1登录校验，格式
+//4. 到处路由对象
+module.exports = router
+```
+
+2. controller
+```
+
+const {createOrUpdate} =require('../service/cart.service')
+
+class CartController {
+  async add(ctx) {
+    //将商品添加到购物车
+    //1. 解析user_id，goods_id
+    const user_id = ctx.state.user.id;
+    const goods_id = ctx.request.body.goods_id;
+    // console.log(user_id,goods_id);
+    //2. 操作数据库
+    const res = await createOrUpdate(user_id,goods_id)
+    //3. 返回结果
+    ctx.body = {
+        code:0,
+        message:'添加到购物车成功',
+        result:res
+    }
+  }
+}
+
+module.exports = new CartController();
+
+```
+3. service
+
+```
+const { Op } = require('sequelize')
+const Cart = require('../model/cart.model')
+class CartService{
+    async createOrUpdate(user_id,goods_id){
+        //根据user_id和goods_id同时查有没有记录
+        let res = await Cart.findOne({
+            where:{
+                [Op.and]:{
+                    user_id,
+                    goods_id,
+                }
+            }
+        })
+
+        if(res){
+            //存在记录,将number加一
+            await res.increment('number',{by:1})
+            return await res.reload()
+        }else{
+             return await Cart.create({
+                 user_id,
+                 goods_id,
+             })
+        }
+
+    }
+}
+module.exports = new CartService()
+
+```
+
+4. model
+```
+//1. 导入sequelize,类型限制
+const { DataTypes } = require("sequelize");
+const seq = require("../db/seq");
+//2. 定义表，限制类型
+const Cart = seq.define("zd_carts", {
+  goods_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    comment: "商品id",
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    comment: "用户id",
+  },
+  number: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    comment: "商品数量",
+  },
+  selected: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+    comment: "是否选中",
+  },
+});
+//?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
+const User = require("./user.model");
+User.hasOne(Cart, {
+  foreignKey: "user_id",
+});
+Cart.belongsTo(User, {
+  foreignKey: "user_id",
+});
+//3.同步
+// Cart.sync({ force: true });
+//4.导出
+
+module.exports = Cart;
+
+```

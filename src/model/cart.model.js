@@ -2,6 +2,9 @@
 const { DataTypes } = require("sequelize");
 const seq = require("../db/seq");
 //2. 定义表，限制类型
+const Goods = require('./goods.model')
+const User = require("./user.model");
+
 const Cart = seq.define("zd_carts", {
   goods_id: {
     type: DataTypes.INTEGER,
@@ -27,13 +30,17 @@ const Cart = seq.define("zd_carts", {
   },
 });
 //?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
-const User = require("./user.model");
-User.hasOne(Cart, {
-  foreignKey: "user_id",
-});
+// User.hasOne(Cart, {
+//   foreignKey: "user_id",
+// });
 Cart.belongsTo(User, {
   foreignKey: "user_id",
 });
+//?这种方式也行
+Cart.belongsTo(Goods,{
+  foreignKey:'goods_id',
+  as:"goods_info"
+})
 //3.同步
 // Cart.sync({ force: true });
 //4.导出

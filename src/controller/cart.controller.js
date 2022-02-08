@@ -19,8 +19,9 @@ class CartController {
   async findAll(ctx){
     //1. 解析请求参数
     const {pageNum = 1,pageSize=10} = ctx.request.query
+    const {id} = ctx.state.user
     //2. 操作数据库
-    const res = await findCarts({pageNum,pageSize})
+    const res = await findCarts({id,pageNum,pageSize})
     //3. 返回结果
     ctx.body = {
       code:0,

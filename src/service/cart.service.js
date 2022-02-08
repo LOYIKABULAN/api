@@ -24,16 +24,17 @@ class CartService {
       });
     }
   }
-  async findCarts({ pageNum, pageSize }) {
+  async findCarts({ id, pageNum, pageSize }) {
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await Cart.findAndCountAll({
+      where: { user_id: id },
       attributes: ["id", "number", "selected"],
       offset,
       limit: pageSize * 1,
       include: {
         model: Goods,
         as: "goods_info",
-        attributes: ["id", "goods_name","goods_price",'goods_image'],
+        attributes: ["id", "goods_name", "goods_price", "goods_image"],
       },
     });
     return {

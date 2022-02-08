@@ -38,6 +38,56 @@ module.exports = {
     code:'10102',
     message:'token无效',
     result:''
+  },
+  hasNotAdminPermission:{
+    code:'10103',
+    message:'没有管理员权限',
+    result:''
+  },
+  fileUploadError:{
+    code:'10201',
+    message:'图片上传错误',
+    result:''
+  },
+  unSupportFileType:{
+    code:'10202',
+    message:'不支持的文件格式',
+    result:''
+  },
+  goodFormatError:{
+    code:'10203',
+    message:'商品上传格式错误',
+    result:''
+  },
+  publishGoodsError:{
+    code:'10204',
+    message:'发布商品失败',
+    result:''
+  },
+  updateGoodsError:{
+    code:'10205',
+    message:'修改商品失败',
+    result:''
+  },
+  invalidGoodsId:{
+    code:'10206',
+    message:'无效商品id',
+    result:''
+  },
+  deleteGoodsError:{
+    code:'10207',
+    message:'下架商品失败',
+    result:''
+  },
+  restoreGoodsError:{
+    code:'10208',
+    message:'上架商品失败',
+    result:''
+  },
+  findGoodsParamsError:{
+    code:'10301',
+    message:'查找失败，请检查参数',
+    result:'参数错误'
   }
 
 };

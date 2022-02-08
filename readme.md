@@ -774,22 +774,24 @@ module.exports = {
 router.post('/login', userValidator, verifyLogin, login)
 ```
 
-
 # 十四、用户的认证
 
-登录成功后，给用户颁发一个令牌token，用户在以后的每一次请求中携带token。
+登录成功后，给用户颁发一个令牌 token，用户在以后的每一次请求中携带 token。
 
 jwt：JSON WEB TOKEN
- - header:头部
- - payload：载荷
- - signature：签名
 
-## 1.颁发token
- #### 1.安装jsonwebtoken
+- header:头部
+- payload：载荷
+- signature：签名
+
+## 1.颁发 token
+
+#### 1.安装 jsonwebtoken
 
     npm i jsonwebtoken
 
-#### 2.在控制器中改写login方法
+#### 2.在控制器中改写 login 方法
+
 ```
 async login(ctx, next) {
     const {user_name} = ctx.request.body;
@@ -811,13 +813,15 @@ async login(ctx, next) {
 ```
 
 #### 3.定义私钥
+
 在 `.env`中定义
 
       WT_SECRET = zxd
 
 ## 2.用户认证
 
-#### 1.创建auth中间件
+#### 1.创建 auth 中间件
+
 ```
 // @ts-ignore
 const jwt = require("jsonwebtoken");
@@ -859,9 +863,558 @@ module.exports = {
 
 ```
 
-#### 改写router
+#### 改写 router
+
 ```
 router.patch('/',auth)
 
 ```
 
+# 十五、商品模块
+
+## 1.路由自动加载
+
+##### （1）新建`src/router/index.js`
+
+```
+const fs = require('fs')
+
+const Router =require('koa-router')
+const router = new Router()
+
+fs.readdirSync(__dirname).forEach((file) =>{
+  if (file!== 'index.js') {
+    let r =   require('./'+file)
+    router.use(r.routes())
+  }
+})
+
+module.exports = router
+
+```
+
+##### （2）改写`src/app/index.js`
+
+```
+// @ts-nocheck
+const Koa = require('koa');
+const koaBody = require('koa-body');
+
+const app = new Koa();
+
+
+
+const router = require('../router')
+
+const errHandler = require('./errHandler')
+
+app.use(koaBody())
+
+app.use(router.routes()).use(router.allowedMethods())
+//统一的错误处理
+app.on('error',errHandler)
+
+module.exports = app
+```
+
+## 2.封装管理权限
+
+##### （1）修改 auth.middleware.js
+
+```
+// @ts-ignore
+const jwt = require("jsonwebtoken");
+const {hasNotAdminPermission} =require('../constants/err.type')
+// @ts-ignore
+const { JWT_SECRET } = require("../config/config.default");
+const { tokenExpiredError,jsonWebTokenError } = require("../constants/err.type");
+const auth = async (ctx, next) => {
+  const { authorization } = ctx.request.header;
+  const token = authorization.replace("Bearer ", "");
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+    ctx.state.user = user;
+  } catch (error) {
+    console.error(error);
+    switch (error.name) {
+      case "TokenExpiredError":
+        console.error("token失效", error);
+        return ctx.app.emit("error", tokenExpiredError, ctx);
+      case "JsonWebTokenError":
+        console.error("token无效", error);
+        return ctx.app.emit("error", jsonWebTokenError, ctx);
+    }
+  }
+
+  await next();
+};
+
+const hadAdminPermission = async (ctx,next) =>{
+  const {is_admin} = ctx.state.user
+  if (!is_admin) {
+    console.error('该用户没有管理员权限',ctx.state.user);
+    return ctx.app.emit('error',hasNotAdminPermission,ctx)
+  }
+  await next()
+}
+
+module.exports = {
+  auth,
+  hadAdminPermission,
+};
+
+```
+
+##### 2.新增 err.type.js
+
+```
+  hasNotAdminPermission:{
+    code:'10103',
+    message:'没有管理员权限',
+    result:''
+  }
+
+```
+
+##### 3.在 goods.route.js 中使用
+
+```
+router.post('/upload',auth,hadAdminPermission,upload)
+
+
+```
+
+# 十六、文件上传功能
+
+## 1.在`app/index.js`中使用 koa-body 开启文件上传
+
+```
+app.use(
+  koaBody({
+    multipart: true, //Parse multipart bodies, default false
+    formidable: {
+      // {Object} Options to pass to the formidable multipart parser
+      //!Ii is not recommend to use relative paths in configuration options
+      //?the relative path in the configuration item, not relative to the current file, relative to process.cwd() :The process.cwd() method returns the current working directory of the Node.js process.
+      //__dirname The directory name of the current module. This is the same as the path.dirname() of the __filename.
+      // uploadDir: path.join(__dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
+      keepExtensions: true, // {Boolean} Files written to uploadDir will include the extensions of the original files, default false
+      maxFileSize:200*1024*1024,
+    },
+  })
+);
+```
+
+## 2.新建`src/utils/upload.js`
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+module.exports = {
+  async upload(ctx, next, fileType) {
+    const { file } = ctx.request.files;
+    const fileTypes = fileType;
+    if (file) {
+      if (!fileTypes.includes(file.type)) {
+        return ctx.app.emit("error", unSupportFileType, ctx);
+      }
+      const reader = fs.createReadStream(file.path);
+      let filePath =
+        path.join(__dirname, "../upload") + `/${path.basename(file.path)}`;
+      const upStream = fs.createWriteStream(filePath);
+      reader.pipe(upStream);
+      ctx.body = {
+        code: 0,
+        message: "上传成功",
+        result: {
+          goods_img: path.basename(filePath),
+        },
+      };
+    } else {
+      return ctx.app.emit("error", fileUploadError, ctx);
+    }
+  },
+};
+
+```
+
+## 3.在 controller.js 中改写
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+const {upload} = require('../utils/upload')
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx,next,["image/jpeg", "image/png"])
+  }
+}
+
+module.exports = new GoodController();
+
+```
+
+## 4.在 router 中改写
+
+```
+// @ts-nocheck
+const path = require("path");
+const fs = require('fs')
+const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+const {upload} = require('../utils/upload')
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx,next,["image/jpeg", "image/png"])
+  }
+}
+
+module.exports = new GoodController();
+
+```
+
+# 十七、统一参数校验
+
+## 1.安装`koa-parameter`
+
+npm i koa-parameter
+
+## 2.写 validator 核验参数格式
+
+```
+const validator = async (ctx, next) => {
+  const { goodFormatError } = require("../constants/err.type");
+  try {
+    ctx.verifyParams({
+      goods_name: { type: "string", required: true },
+      goods_price: { type: "number", required: true },
+      goods_num: { type: "number", required: true },
+      goods_image: { type: "string", required: true },
+    });
+  } catch (err) {
+    console.error(err);
+    goodFormatError.result = err.errors;
+    return ctx.app.emit("error", goodFormatError, ctx);
+  }
+  await next();
+};
+
+module.exports = {
+  validator,
+};
+```
+
+# 十八、发布商品
+
+## 1. controller
+
+```
+// @ts-nocheck
+const {  publishGoodsError} = require("../constants/err.type");
+const { upload } = require("../utils/upload");
+const { createGoods} =require('../service/goods.service')
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx, next, ["image/jpeg", "image/png"]);
+  }
+  async create(ctx) {
+    //之间调用service 的createGoods方法
+    try {
+      const {createdAt,updatedAt,...res} =  await createGoods(ctx.request.body);
+      ctx.body={
+        code:0,
+        message:'发布商品成功',
+        result:res
+      }
+    } catch (error) {
+      console.error('发布商品出错',error);
+      return ctx.app.emit('error',publishGoodsError,ctx)
+    }
+  }
+}
+
+module.exports = new GoodController();
+
+```
+
+## 2.service
+
+```
+// @ts-nocheck
+const Goods = require('../model/goods.model')
+class GoodsService{
+    async createGoods(goods){
+        const res = await Goods.create(goods)
+        return res.dataValues;
+    }
+}
+
+module.exports = new GoodsService()
+```
+
+## 3.model
+
+```
+const {DataTypes} = require('sequelize');
+
+const seq = require('../db/seq')
+
+const Goods = seq.define('zd_good',{
+    goods_name:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        comment:'商品名称'
+    },
+    goods_price:{
+        type:DataTypes.DECIMAL(10,2),//十位数，末尾保持两个小数
+        allowNull:false,
+        comment:'商品价格'
+    },
+    goods_num:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        comment:'商品的库存'
+    },
+    goods_image:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        comment:'商品图片的地址'
+    },
+
+})
+
+// Goods.sync({force:true});
+
+module.exports = Goods;
+```
+
+# 十九、修改商品
+
+## 1.route
+
+```
+const Router = require("koa-router");
+
+const router = new Router({ prefix: "/goods" });
+
+const { auth, hadAdminPermission } = require("../middleware/auth.middleware");
+
+const { uploadImg, create,update } = require("../controller/goods.controller");
+const { validator } = require("../middleware/goods.middleware");
+//商品图片上传接口
+router.post("/upload", auth, hadAdminPermission, uploadImg);
+// router.post('/upload',uploadImg)
+
+//发布商品接口
+router.post("/", auth, hadAdminPermission, validator,create);
+
+//修改商品接口
+router.put('/:id',auth,hadAdminPermission,validator,update)
+module.exports = router;
+
+```
+
+## 2.service
+
+```// @ts-nocheck
+const Goods = require('../model/goods.model')
+class GoodsService{
+    async createGoods(goods){
+        const res = await Goods.create(goods)
+        return res.dataValues;
+    }
+    async updateGoods(id,goods){
+        const res = await Goods.update(goods,{where:{id}})
+
+        return res[0] > 0 ? true : false
+    }
+}
+
+module.exports = new GoodsService()
+```
+
+## 3. controller
+
+```
+// @ts-nocheck
+const {
+  publishGoodsError,
+  updateGoodsError,
+  invalidGoodsId,
+} = require("../constants/err.type");
+const { upload } = require("../utils/upload");
+const { createGoods ,updateGoods} = require("../service/goods.service");
+class GoodController {
+  //upload其实可以作为工具单独工具上传多种文件
+  async uploadImg(ctx, next) {
+    upload(ctx, next, ["image/jpeg", "image/png"]);
+  }
+  async create(ctx) {
+    //之间调用service 的createGoods方法
+    try {
+      const { createdAt, updatedAt, ...res } = await createGoods(
+        ctx.request.body
+      );
+      ctx.body = {
+        code: 0,
+        message: "发布商品成功",
+        result: res,
+      };
+    } catch (error) {
+      console.error("发布商品出错", error);
+      return ctx.app.emit("error", publishGoodsError, ctx);
+    }
+  }
+  async update(ctx) {
+    try {
+      const res = await updateGoods(ctx.params.id, ctx.request.body);
+      if (res) {
+        ctx.body = {
+          code: 0,
+          message: "修改商品成功",
+          result: "",
+        };
+      } else {
+        return ctx.app.emit("error", invalidGoodsId, ctx);
+      }
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit("error", updateGoodsError, ctx);
+    }
+  }
+}
+
+module.exports = new GoodController();
+
+```
+
+# 二十、删除商品接口
+
+## 1.硬删除
+
+    1.router
+    router.delete("/:id", auth, hadAdminPermission, remove);
+
+    2.controller
+    async remove(ctx) {
+    await removeGoods (ctx.params.id)
+    ctx.body = {
+      code:0,
+      message:'删除商品成功',
+      result:''
+    }
+    }
+
+    3.
+    async removeGoods(id) {
+    const res = await Goods.destroy({ where: { id } });
+    return res[0] > 0 ? true : false;
+    }
+
+## 2.软删除
+
+1. //软删除接口
+   router.post('/:id/off',auth,hadAdminPermission,remove)
+   //商品上架
+   router.post('/:id/on',auth,hadAdminPermission,restore)
+2. async remove(ctx) {
+   try {
+   const res = await removeGoods(ctx.params.id);
+   if (res) {
+   ctx.body = {
+   code: 0,
+   message: "下架商品成功",
+   result: "",
+   };
+   } else {
+   return ctx.app.emit("error", invalidGoodsId, ctx);
+   }
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit("error", deleteGoodsError, ctx);
+   }
+   }
+   async restore(ctx) {
+   try {
+   const res = await restoreGoods(ctx.params.id);
+   if (res) {
+   ctx.body = {
+   code: 0,
+   message: "上架商品成功",
+   result: "",
+   };
+   } else {
+   return ctx.app.emit("error", invalidGoodsId, ctx);
+   }
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit("error", restoreGoodsError, ctx);
+   }
+   }
+
+   3. async removeGoods(id) {
+      const res = await Goods.destroy({ where: { id } });
+      // console.log(res);
+      return res > 0 ? true : false;
+      }
+      async restoreGoods(id) {
+      const res = await Goods.restore({ where: { id } });
+      return res > 0 ? true : false;
+      }
+
+# 二十一、商品列表实现
+
+1. //获取商品列表
+   router.get('/',findAll)
+2. async findAll(ctx) {
+   try {
+   // 1.解析 pageNum 和 pageSize
+   const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+   // 2.调用数据处理的相关方法
+   const res = await findGoods(pageNum, pageSize);
+   // 3. 返回结果
+   ctx.body = {
+   code: 0,
+   message: "获取商品列表成功",
+   result: res,
+   };
+   } catch (error) {
+   console.error(error);
+   return ctx.app.emit('error',findGoodsParamsError,ctx)
+   }
+   }
+3. async findGoods(pageNum, pageSize) {
+   //1.获取总数
+   // const count = await Goods.count();
+   // console.log(count);
+   //2.获取分页的具体数据
+   // try {
+   // const offset = (pageNum - 1) _ pageSize;
+   // const rows = await Goods.findAll({ offset, limit: pageSize _ 1 });
+   // return {
+   // pageNum,
+   // pageSize,
+   // total:count,
+   // list:rows
+   // }
+   // } catch (error) {
+   // console.error(error);
+   // }
+   const offset = (pageNum - 1) _ pageSize;
+   const { count, rows } = await Goods.findAndCountAll({
+   offset,
+   limit: pageSize _ 1,
+   });
+   return {
+   pageNum,
+   pageSize,
+   total: count,
+   list: rows,
+   };
+   }

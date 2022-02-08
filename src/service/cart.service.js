@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { Op } = require("sequelize");
 const Cart = require("../model/cart.model");
 const Goods = require("../model/goods.model");
@@ -43,6 +44,20 @@ class CartService {
       total: count,
       list: rows,
     };
+  }
+  async updateCarts({id,number,selected}){
+    //findByPk 方法使用提供的主键从表中仅获得一个条目.
+    const res =await Cart.findByPk(id)
+    console.log(res);
+    if (!res) return ''
+    
+    number !== undefined ? (res.number=number) : ''
+
+    if (selected !== undefined) {
+      res.selected = selected
+    }
+    return await res.save()
+
   }
 }
 module.exports = new CartService();

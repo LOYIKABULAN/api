@@ -1547,7 +1547,6 @@ module.exports = Cart;
 
 ```
 # 二十三、获取购物车列表
-
 1. router
 ```
 //3.2获取购物车列表
@@ -1589,7 +1588,7 @@ router.get('/',auth,findAll)
     };
   }
   ```
-  4. model
+4. model
   ```
   //?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
 // User.hasOne(Cart, {
@@ -1603,4 +1602,94 @@ Cart.belongsTo(Goods,{
   foreignKey:'goods_id',
   as:"goods_info"
 })
+```
+
+
+# 二十四、更新购物车
+
+1. router
+```
+router.patch(
+  "/:id",
+  auth,
+  validator({
+    number: { type: "number", required: false },
+    selected: { type: "bool", required: false },
+  }),
+  update
+);
+```
+
+2. controller
+```
+  async update(ctx){
+    //1. 解析参数
+    const {id} = ctx.request.params
+    const {number,selected}= ctx.request.body
+    if (number === undefined && selected === undefined) {
+      cartFormateError.message = 'number和selected不能同时为空'
+      return ctx.app.emit('error',cartFormateError,ctx)
+      
+    }
+    //2. 操作数据库
+    const res = await updateCarts({id,number,selected})
+    //3. 返回数据
+     ctx.body={
+      code:0,
+      message:'更新购物车成功',
+      result:res
+    }
+  }
+```
+
+3. service
+```
+ async updateCarts({id,number,selected}){
+    //findByPk 方法使用提供的主键从表中仅获得一个条目.
+    const res =await Cart.findByPk(id)
+    console.log(res);
+    if (!res) return ''
+    
+    number !== undefined ? (res.number=number) : ''
+
+    if (selected !== undefined) {
+      res.selected = selected
+    }
+    return await res.save()
+
+  }
+```
+
+4. middleware
+
+```
+const { cartFormateError } = require("../constants/err.type");
+// const validator = async (ctx,next) =>{
+//     try {
+//         ctx.verifyParams({
+//             goods_id:'number'
+//         })
+//     } catch (error) {
+//         console.error(error);
+//         invalidGoodsId.result = error
+//         return ctx.app.emit('error',invalidGoodsId,ctx)
+//     }
+//     return next()
+// }
+const validator = (rules) => {
+  return async (ctx, next) => {
+    try {
+      ctx.verifyParams(rules);
+    } catch (error) {
+      console.error(error);
+      cartFormateError.result = error;
+      return ctx.app.emit("error", cartFormateError, ctx);
+    }
+    return next();
+  };
+};
+
+module.exports = {
+  validator,
+};
 ```

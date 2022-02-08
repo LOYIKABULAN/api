@@ -88,6 +88,11 @@ module.exports = {
     code:'10301',
     message:'查找失败，请检查参数',
     result:'参数错误'
+  },
+  cartFormateError:{
+    code:'10302',
+    message:'购物车格式错误',
+    result:''
   }
 
 };

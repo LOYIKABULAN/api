@@ -1418,9 +1418,11 @@ module.exports = new GoodController();
    list: rows,
    };
    }
+
 # 二十二、添加到购物车接口
 
 1. router
+
 ```
 //1. 导入koa-router
 const Router = require('koa-router')
@@ -1442,6 +1444,7 @@ module.exports = router
 ```
 
 2. controller
+
 ```
 
 const {createOrUpdate} =require('../service/cart.service')
@@ -1467,6 +1470,7 @@ class CartController {
 module.exports = new CartController();
 
 ```
+
 3. service
 
 ```
@@ -1502,6 +1506,7 @@ module.exports = new CartService()
 ```
 
 4. model
+
 ```
 //1. 导入sequelize,类型限制
 const { DataTypes } = require("sequelize");
@@ -1546,13 +1551,18 @@ Cart.belongsTo(User, {
 module.exports = Cart;
 
 ```
+
 # 二十三、获取购物车列表
+
 1. router
+
 ```
 //3.2获取购物车列表
 router.get('/',auth,findAll)
 ```
+
 2. controller
+
 ```
  async findAll(ctx){
     //1. 解析请求参数
@@ -1566,7 +1576,9 @@ router.get('/',auth,findAll)
       result:res
     }
 ```
+
 3. service
+
 ```
  async findCarts({ pageNum, pageSize }) {
     const offset = (pageNum - 1) * pageSize;
@@ -1587,27 +1599,29 @@ router.get('/',auth,findAll)
       list: rows,
     };
   }
-  ```
+```
+
 4. model
-  ```
-  //?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
+
+```
+//?官方文档创建外键的方法会多创建一个默认外键，在github issue找到这段代码
 // User.hasOne(Cart, {
 //   foreignKey: "user_id",
 // });
 Cart.belongsTo(User, {
-  foreignKey: "user_id",
+foreignKey: "user_id",
 });
 //?这种方式也行
 Cart.belongsTo(Goods,{
-  foreignKey:'goods_id',
-  as:"goods_info"
+foreignKey:'goods_id',
+as:"goods_info"
 })
 ```
-
 
 # 二十四、更新购物车
 
 1. router
+
 ```
 router.patch(
   "/:id",
@@ -1621,6 +1635,7 @@ router.patch(
 ```
 
 2. controller
+
 ```
   async update(ctx){
     //1. 解析参数
@@ -1629,7 +1644,7 @@ router.patch(
     if (number === undefined && selected === undefined) {
       cartFormateError.message = 'number和selected不能同时为空'
       return ctx.app.emit('error',cartFormateError,ctx)
-      
+
     }
     //2. 操作数据库
     const res = await updateCarts({id,number,selected})
@@ -1643,13 +1658,14 @@ router.patch(
 ```
 
 3. service
+
 ```
  async updateCarts({id,number,selected}){
     //findByPk 方法使用提供的主键从表中仅获得一个条目.
     const res =await Cart.findByPk(id)
     console.log(res);
     if (!res) return ''
-    
+
     number !== undefined ? (res.number=number) : ''
 
     if (selected !== undefined) {
@@ -1693,3 +1709,45 @@ module.exports = {
   validator,
 };
 ```
+
+# 二十五、删除购物车
+
+1.  //3.4 删除购物车（还未判断购物车商品是否存在)
+    router.delete('/',auth,validator({ids:'array'}),remove)
+
+2.  async remove(ctx){
+    const {ids} = ctx.request.body
+    const res = await removeCart(ids)
+    ctx.body = {
+    code:0,
+    message:'删除购物车成功',
+    result:''
+    }
+    }
+
+3.  async removeCart(ids){
+    Cart.destroy({
+    where:{
+    id:{
+    [Op.in]:ids
+    }
+    }
+    })
+    }
+
+4.  app/index.js
+    app.use(
+    koaBody({
+    multipart: true, //Parse multipart bodies, default false
+    formidable: {
+    // {Object} Options to pass to the formidable multipart parser
+    //!Ii is not recommend to use relative paths in configuration options
+    //?the relative path in the configuration item, not relative to the current file, relative to process.cwd() :The process.cwd() method returns the current working directory of the Node.js process.
+    //**dirname The directory name of the current module. This is the same as the path.dirname() of the **filename.
+    // uploadDir: path.join(\_\_dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
+    keepExtensions: true, // {Boolean} Files written to uploadDir will include the extensions of the original files, default false
+    maxFileSize: 200 _ 1024 _ 1024,
+    },
+    parsedMethods: ["POST", "PUT", "PATCH", "DELETE"],
+    })
+    );

@@ -6,7 +6,7 @@ const path = require("path");
 const Koa = require("koa");
 const koaBody = require("koa-body");
 const KoaStatic = require("koa-static");
-const parameter = require('koa-parameter')
+const parameter = require("koa-parameter");
 //self-written modules
 const app = new Koa();
 
@@ -23,13 +23,14 @@ app.use(
       //__dirname The directory name of the current module. This is the same as the path.dirname() of the __filename.
       // uploadDir: path.join(__dirname, "../upload"), // {String} Sets the directory for placing file uploads in, default os.tmpDir():Returns the operating system's default directory for temporary files as a string.
       keepExtensions: true, // {Boolean} Files written to uploadDir will include the extensions of the original files, default false
-      maxFileSize:200*1024*1024,
+      maxFileSize: 200 * 1024 * 1024,
     },
+    parsedMethods: ["POST", "PUT", "PATCH", "DELETE"],
   })
 );
 
 app.use(KoaStatic(path.join(__dirname, "../upload")));
-app.use(parameter(app))
+app.use(parameter(app));
 app.use(router.routes()).use(router.allowedMethods());
 //统一的错误处理
 app.on("error", errHandler);

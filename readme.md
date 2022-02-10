@@ -1830,8 +1830,8 @@ class addrController{
 module.exports= new addrController
 ```
 
+3.
 
-3. 
 ```
 // @ts-nocheck
 const Address = require("../model/addr.model");
@@ -1845,7 +1845,8 @@ module.exports = new addrService();
 
 ```
 
-4. 
+4.
+
 ```
 //1.导入sequelize
 const seq = require('../db/seq')
@@ -1886,7 +1887,8 @@ const Address = seq.define('zd_addresses',{
 module.exports = Address
 ```
 
-5. 
+5.
+
 ```
 const { addrFormateError } = require("../constants/err.type");
 const validator = (rules) => {
@@ -1906,4 +1908,112 @@ module.exports = {
   validator,
 };
 
+```
+
+# 二十八、查找更新地址
+
+```
+1.
+//3.2获取地址列表
+router.get('/',auth,findAll)
+//3.3 更新地址列表
+router.put('/:id',validator({
+  consignee: "string",
+  phone: {
+    type: "string",
+    format: /^1\d{10}$/,
+  },
+  address: "string",
+}),update)
+```
+
+```
+2.
+
+ async findAll(ctx) {
+    const user_id = ctx.state.user.id;
+    const res = await findAllAddr(user_id);
+    ctx.body = {
+      code: 0,
+      message: "查找地址成功",
+      result: res,
+    };
+  }
+  async update(ctx) {
+    const { id } = ctx.request.params;
+    const res = await updateAddr(id,ctx.request.body)
+    ctx.body = {
+        code:0,
+        message:'更新地址成功',
+        result:res
+    };
+  }
+```
+
+```
+3.
+  async findAllAddr(user_id) {
+    return await Address.findAll({
+      attributes: ["id", "consignee", "phone", "address", "is_default"],
+      where: { user_id },
+    });
+  }
+  async updateAddr(id, addr) {
+    return await Address.update(addr, { where: { id } });
+  }
+```
+
+# 二十九、删除与默认地址
+
+```
+router.delete('/:id',auth,remove)
+
+//3.5设置默认
+router.patch('/:id',auth,setDefault)
+
+```
+
+```
+  async remove(ctx) {
+    const id = ctx.request.params.id;
+    const res = await removeAddr(id);
+    ctx.body = {
+      code: 0,
+      message: "删除地址成功",
+      result: res,
+    };
+  }
+  async setDefault(ctx){
+      const id = ctx.request.params.id;
+      const user_id = ctx.state.user.id;
+      const res = await setDefaultAddr({id,user_id})
+      ctx.body = {
+          code:0,
+          message:'设置默认地址成功',
+          result:res
+      }
+  }
+```
+
+```
+  async removeAddr(id) {
+    return await Address.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+  async setDefaultAddr({ id, user_id }) {
+      console.log(id,user_id);
+    await Address.update({ is_default: false }, { where: { user_id } });
+    return await Address.update(
+      { is_default: true },
+      {
+        where: {
+          user_id,
+          id,
+        },
+      }
+    );
+  }
 ```

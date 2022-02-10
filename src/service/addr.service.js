@@ -13,6 +13,26 @@ class addrService {
   async updateAddr(id, addr) {
     return await Address.update(addr, { where: { id } });
   }
+  async removeAddr(id) {
+    return await Address.destroy({
+      where: {
+        id,
+      },
+    });
+  }
+  async setDefaultAddr({ id, user_id }) {
+      console.log(id,user_id);
+    await Address.update({ is_default: false }, { where: { user_id } });
+    return await Address.update(
+      { is_default: true },
+      {
+        where: {
+          user_id,
+          id,
+        },
+      }
+    );
+  }
 }
 
 module.exports = new addrService();

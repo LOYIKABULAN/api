@@ -1,5 +1,5 @@
 // @ts-nocheck
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const Cart = require("../model/cart.model");
 const Goods = require("../model/goods.model");
 class CartService {
@@ -45,28 +45,35 @@ class CartService {
       list: rows,
     };
   }
-  async updateCarts({id,number,selected}){
+  async updateCarts({ id, number, selected }) {
     //findByPk 方法使用提供的主键从表中仅获得一个条目.
-    const res =await Cart.findByPk(id)
+    const res = await Cart.findByPk(id);
     console.log(res);
-    if (!res) return ''
-    
-    number !== undefined ? (res.number=number) : ''
+    if (!res) return "";
+
+    number !== undefined ? (res.number = number) : "";
 
     if (selected !== undefined) {
-      res.selected = selected
+      res.selected = selected;
     }
-    return await res.save()
-
+    return await res.save();
   }
-  async removeCart(ids){
+  async removeCart(ids) {
     Cart.destroy({
-      where:{
-        id:{
-          [Op.in]:ids
-        }
-      }
-    })
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    });
+  }
+  async selectAllGoods(user_id, select) {
+    if (select) {
+      return await Cart.update({ selected: true }, { where: { user_id } });
+    }
+    else{
+      return await Cart.update({ selected: false }, { where: { user_id } });
+    }
   }
 }
 module.exports = new CartService();

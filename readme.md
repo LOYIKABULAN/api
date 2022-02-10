@@ -245,7 +245,7 @@ service 层主要是做数据库处理
 ```
 class UserService {
     async createUser(user_name,password){
-        // TODO:写入数据库
+        // 写入数据库
         return '写入数据库成功'
     }
 }
@@ -465,7 +465,7 @@ module.exports = new UserController();
 const User = require("../model/user.model");
 class UserService {
   async createUser(user_name, password) {
-    // TODO:写入数据库
+    // 写入数据库
     const res =await User.create({user_name, password});//可以使用try catch 来解决报错
     // console.log(res);
     return res.dataValues;
@@ -1751,3 +1751,29 @@ module.exports = {
     parsedMethods: ["POST", "PUT", "PATCH", "DELETE"],
     })
     );
+
+
+# 二十六、全选与全不选
+```
+router.post("/selectAll", auth,validator({select:'boolean'}), selectAll);
+
+  async selectAll(ctx){
+    const {id} = ctx.state.user;
+    const {select}=ctx.request.body
+    const res = await selectAllGoods(id,select);
+    ctx.body = {
+      code: 0,
+      message:select ? '全部选中':'取消全选',
+      result:res
+    }
+  }
+
+    async selectAllGoods(user_id, select) {
+    if (select) {
+      return await Cart.update({ selected: true }, { where: { user_id } });
+    }
+    else{
+      return await Cart.update({ selected: false }, { where: { user_id } });
+    }
+  }
+```

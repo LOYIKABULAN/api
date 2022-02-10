@@ -1,5 +1,5 @@
 const { cartFormateError } = require('../constants/err.type');
-const {createOrUpdate,findCarts,updateCarts,removeCart} =require('../service/cart.service')
+const {createOrUpdate,findCarts,updateCarts,removeCart,selectAllGoods} =require('../service/cart.service')
 
 class CartController {
   async add(ctx) {
@@ -57,6 +57,17 @@ class CartController {
       result:''
     }
   }
+  async selectAll(ctx){
+    const {id} = ctx.state.user;
+    const {select}=ctx.request.body
+    const res = await selectAllGoods(id,select);
+    ctx.body = {
+      code: 0,
+      message:select ? '全部选中':'取消全选',
+      result:res
+    }
+  }
+  
 }
 
 module.exports = new CartController();

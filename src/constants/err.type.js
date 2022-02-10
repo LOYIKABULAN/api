@@ -93,6 +93,12 @@ module.exports = {
     code:'10302',
     message:'购物车格式错误',
     result:''
-  }
+  },
+  addrFormateError:{
+    code:'10401',
+    message:'地址参数错误',
+    result:''
+  },
+
 
 };

@@ -31,6 +31,7 @@ app.use(
 
 app.use(KoaStatic(path.join(__dirname, "../upload")));
 app.use(parameter(app));
+//allowedMethods，顾名思义：就是当前接口运行的method。 比如，一个提供数据的接口，就可以设置为GET， 当客户端发送POST请求时，就会直接返回失败。
 app.use(router.routes()).use(router.allowedMethods());
 //统一的错误处理
 app.on("error", errHandler);

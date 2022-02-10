@@ -1752,8 +1752,8 @@ module.exports = {
     })
     );
 
-
 # 二十六、全选与全不选
+
 ```
 router.post("/selectAll", auth,validator({select:'boolean'}), selectAll);
 
@@ -1776,4 +1776,134 @@ router.post("/selectAll", auth,validator({select:'boolean'}), selectAll);
       return await Cart.update({ selected: false }, { where: { user_id } });
     }
   }
+```
+
+# 二十七、添加地址
+
+```
+//1. 导入koa-router
+const Router = require("koa-router");
+
+//中间件\控制器
+const { auth } = require("../middleware/auth.middleware");
+const { validator } = require("../middleware/addr.middleware");
+const { create } = require("../controller/addr.controller");
+//2. 实例化koa-router
+const router = new Router({ prefix: "/address" });
+//3. 编写路由规则
+//3.1添加地址接口(validator还可以统一封装)
+router.post(
+  "/",
+  auth,
+  validator({
+    consignee: "string",
+    phone: {
+      type: "string",
+      format: /^1\d{10}$/,
+    },
+    address: "string",
+  }),
+  create
+);
+//4. 导出路由
+module.exports = router;
+
+```
+
+2.
+
+```
+const {createAddr} =require('../service/addr.service')
+class addrController{
+    async create(ctx){
+        const user_id = ctx.state.user.id;
+        const {consignee,phone,address} = ctx.request.body
+        const res = await createAddr({user_id,consignee,phone,address})
+        ctx.body = {
+            code:0,
+            message:'添加地址成功',
+            result:res
+        }
+    }
+}
+
+module.exports= new addrController
+```
+
+
+3. 
+```
+// @ts-nocheck
+const Address = require("../model/addr.model");
+class addrService {
+  async createAddr(params) {
+    return await Address.create(params);
+  }
+}
+
+module.exports = new addrService();
+
+```
+
+4. 
+```
+//1.导入sequelize
+const seq = require('../db/seq')
+const {DataTypes} = require('sequelize')
+//2.定义字段
+const Address = seq.define('zd_addresses',{
+    user_id:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        comment:'用户id'
+    },
+    consignee:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        comment:'收货人姓名'
+    },
+    phone:{
+        type:DataTypes.CHAR(11),
+        allowNull:false,
+        comment:'收货人手机号码',
+    },
+    address:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        comment:'收货地址'
+    },
+    is_default:{
+        type:DataTypes.TINYINT,
+        allowNull:false,
+        defaultValue:false,
+        comment:'是否为默认地址,0:不是;1:是'
+    }
+})
+//3.同步
+// Address.sync({force:true});
+//4.导出
+
+module.exports = Address
+```
+
+5. 
+```
+const { addrFormateError } = require("../constants/err.type");
+const validator = (rules) => {
+  return async (ctx, next) => {
+    try {
+      await ctx.verifyParams(rules);
+    } catch (error) {
+      console.error(error);
+      addrFormateError.result = error
+      return ctx.app.emit("error", addrFormateError, ctx);
+    }
+    await next();
+  };
+};
+
+module.exports = {
+  validator,
+};
+
 ```

@@ -2017,3 +2017,126 @@ router.patch('/:id',auth,setDefault)
     );
   }
 ```
+
+# 三十、生成订单
+
+```
+const Router = require("koa-router");
+const router = new Router({ prefix: "/orders" });
+const { auth } = require("../middleware/auth.middleware");
+const { validator } = require("../middleware/order.middleware");
+const { create } = require("../controller/order.constroller");
+//提交订单
+router.post(
+  "/",
+  auth,
+  validator({
+    address_id: "int",
+    goods_info: "string",
+    total: "string",
+  }),
+  create
+);
+
+module.exports = router;
+
+
+```
+
+```
+const { orderFormatError } = require("../constants/err.type");
+const validator = (rules) => {
+  return async (ctx, next) => {
+    try {
+      ctx.verifyParams(rules);
+    } catch (error) {
+      console.error(error);
+      orderFormatError.result = error
+     return ctx.app.emit("error", orderFormatError, ctx);
+    }
+    await next();
+  };
+};
+
+
+module.exports = {
+    validator
+}
+```
+
+```
+const {createOrder} = require('../service/order.service')
+class orderController {
+    async create(ctx){
+        const user_id = ctx.state.user.id
+        const {address_id,goods_info,total} = ctx.request.body
+        const order_number = "zd"+Date.now()
+        const res = await createOrder({user_id,address_id,goods_info,total,order_number})
+        ctx.body={
+            code:0,
+            message:'生成订单成功',
+            result:res
+        }
+    }
+}
+
+module.exports  = new orderController()
+```
+
+```
+const order = require('../model/order.model')
+class orderService {
+    async createOrder(params){
+        return await order.create(params)
+    }
+}
+
+module.exports = new orderService()
+```
+
+
+```
+const { DataTypes } = require("sequelize");
+const seq = require("../db/seq");
+
+const order = seq.define("zd_orders", {
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull:false,
+    comment:'用户id'
+  },
+  address_id:{
+      type:DataTypes.INTEGER,
+      allowNull:false,
+      comment:'收货地址'
+  },
+  goods_info:{
+      type:DataTypes.TEXT,
+      allowNull:false,
+      comment:'商品信息'
+  },
+  total:{
+      type:DataTypes.DECIMAL(10,2),
+      allowNull:false,
+      comment:'订单总金额'
+  },
+  order_number:{
+      type:DataTypes.CHAR(16),
+      allowNull:false,
+      comment:'订单号'
+  },
+  states:{
+      type:DataTypes.TINYINT,
+      allowNull:false,
+      defaultValue:0,
+      comment:'订单状态加0:未支付,1:已支付,2:已发货,3:已签收,4:取消'
+  }
+});
+
+// order.sync({force:true})
+
+module.exports = order
+
+
+
+```

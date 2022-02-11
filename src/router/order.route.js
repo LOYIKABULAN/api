@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router({ prefix: "/orders" });
 const { auth } = require("../middleware/auth.middleware");
 const { validator } = require("../middleware/order.middleware");
-const { create } = require("../controller/order.constroller");
+const { create,findAll} = require("../controller/order.constroller");
 //提交订单
 router.post(
   "/",
@@ -14,5 +14,7 @@ router.post(
   }),
   create
 );
+// 获取订单
+router.get('/',auth,findAll)
 
 module.exports = router;

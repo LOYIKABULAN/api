@@ -19,6 +19,10 @@ class orderService {
       list: rows,
     };
   }
+  async updateOrder(id, states) {
+    console.log("hh");
+    return await order.update({ states }, { where: { id } });
+  }
 }
 
 module.exports = new orderService();

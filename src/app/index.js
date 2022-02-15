@@ -7,9 +7,11 @@ const Koa = require("koa");
 const koaBody = require("koa-body");
 const KoaStatic = require("koa-static");
 const parameter = require("koa-parameter");
+const cors = require('koa2-cors')
 //self-written modules
 const app = new Koa();
 
+app.use(cors());
 const router = require("../router");
 const errHandler = require("./errHandler");
 // console.log(process.cwd());

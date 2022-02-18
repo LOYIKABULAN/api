@@ -32,7 +32,7 @@ class UserController {
       //从返回结果对象中提出password属性，将剩下的属性放到res新的对象中
       const {password,...res}  = await getUserInfo({user_name})
       ctx.body={
-        code:'0',
+        code:0,
         message:'用户登录成功',
         result:{
           token:jwt.sign(res,JWT_SECRET,{expiresIn:'1d'})

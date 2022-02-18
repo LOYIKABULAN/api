@@ -14,4 +14,13 @@ router.post('/login',userValidator,verifyLogin,login)
 //修改密码接口
 
 router.patch('/',auth,cryptPassword,changePassword)
+
+// 获取用户信息
+router.get("/info", auth, (ctx) => {
+  ctx.body = {
+    code: 0,
+    message: "获取用户信息成功",
+    result: ctx.state.user,
+  };
+});
 module.exports = router

@@ -17,6 +17,12 @@ const User = seq.define('zd_user',{
         allowNull:false,
         Comment:'密码'
     },
+    avatar:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        defaultValue:'http://localhost:3333/avatar.png',
+        comment:'默认头像'
+    },
     is_admin:{
         type:DataTypes.BOOLEAN,
         allowNull:false,

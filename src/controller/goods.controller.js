@@ -53,40 +53,43 @@ class GoodController {
       return ctx.app.emit("error", updateGoodsError, ctx);
     }
   }
-  async remove(ctx) {
-    try {
-      const res = await removeGoods(ctx.params.id);
-      if (res) {
-        ctx.body = {
-          code: 0,
-          message: "下架商品成功",
-          result: "",
-        };
-      } else {
-        return ctx.app.emit("error", invalidGoodsId, ctx);
+  async state(ctx) {
+    console.log(ctx.request.body);
+    if (ctx.request.body.is_deleted) {
+      try {
+        const res = await removeGoods(ctx.params.id);
+        if (res) {
+          ctx.body = {
+            code: 0,
+            message: "下架商品成功",
+            result: "",
+          };
+        } else {
+          return ctx.app.emit("error", invalidGoodsId, ctx);
+        }
+      } catch (error) {
+        console.error(error);
+        return ctx.app.emit("error", deleteGoodsError, ctx);
       }
-    } catch (error) {
-      console.error(error);
-      return ctx.app.emit("error", deleteGoodsError, ctx);
+    } else {
+      try {
+        const res = await restoreGoods(ctx.params.id);
+        if (res) {
+          ctx.body = {
+            code: 0,
+            message: "上架商品成功",
+            result: "",
+          };
+        } else {
+          return ctx.app.emit("error", invalidGoodsId, ctx);
+        }
+      } catch (error) {
+        console.error(error);
+        return ctx.app.emit("error", restoreGoodsError, ctx);
+      }
     }
   }
-  async restore(ctx) {
-    try {
-      const res = await restoreGoods(ctx.params.id);
-      if (res) {
-        ctx.body = {
-          code: 0,
-          message: "上架商品成功",
-          result: "",
-        };
-      } else {
-        return ctx.app.emit("error", invalidGoodsId, ctx);
-      }
-    } catch (error) {
-      console.error(error);
-      return ctx.app.emit("error", restoreGoodsError, ctx);
-    }
-  }
+  async restore(ctx) {}
   async findAll(ctx) {
     try {
       // 1.解析pageNum和pageSize
@@ -101,7 +104,7 @@ class GoodController {
       };
     } catch (error) {
       console.error(error);
-      return ctx.app.emit('error',findGoodsParamsError,ctx)
+      return ctx.app.emit("error", findGoodsParamsError, ctx);
     }
   }
 }

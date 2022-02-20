@@ -9,8 +9,7 @@ const {
   uploadImg,
   create,
   update,
-  remove,
-  restore,
+  state,
   findAll,
 } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
@@ -30,9 +29,8 @@ router.put("/:id", auth, hadAdminPermission, validator, update);
 
 
 //软删除接口
-router.post('/:id/off',auth,hadAdminPermission,remove)
-//商品上架
-router.post('/:id/on',auth,hadAdminPermission,restore)
+//商品上下架
+router.post('/:id/state',auth,hadAdminPermission,state)
 
 //获取商品列表
 

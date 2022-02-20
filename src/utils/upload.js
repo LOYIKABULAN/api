@@ -1,7 +1,8 @@
 // @ts-nocheck
 const path = require("path");
-const fs = require('fs')
-const {fileUploadError,unSupportFileType} = require('../constants/err.type')
+const fs = require("fs");
+const { fileUploadError, unSupportFileType } = require("../constants/err.type");
+const { SERVER_IP,APP_PORT } = require("../config/config.default");
 module.exports = {
   async upload(ctx, next, fileType) {
     const { file } = ctx.request.files;
@@ -19,7 +20,7 @@ module.exports = {
         code: 0,
         message: "上传成功",
         result: {
-          goods_img: path.basename(filePath),
+          goods_img: SERVER_IP+':'+APP_PORT+'/' + path.basename(filePath),
         },
       };
     } else {

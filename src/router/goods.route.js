@@ -34,5 +34,5 @@ router.post('/:id/state',auth,hadAdminPermission,state)
 
 //获取商品列表
 
-router.get('/',findAll)
+router.get('/',auth,hadAdminPermission,findAll)
 module.exports = router;

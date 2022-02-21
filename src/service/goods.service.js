@@ -6,7 +6,7 @@ class GoodsService {
     return res.dataValues;
   }
   async updateGoods(id, goods) {
-    const res = await Goods.update(goods, { where: { id } });
+    const res = await Goods.update(goods, { where: { id } ,paranoid: false});
 
     return res[0] > 0 ? true : false;
   }
@@ -40,6 +40,7 @@ class GoodsService {
     const { count, rows } = await Goods.findAndCountAll({
       offset,
       limit: pageSize * 1,
+      paranoid: false,
     });
     return {
       pageNum,

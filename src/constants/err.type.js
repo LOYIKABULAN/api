@@ -103,6 +103,11 @@ module.exports = {
     code:'10501',
     message:'订单参数错误',
     result:''
+  },
+  deleteAdError:{
+    code:'10601',
+    message:'删除失败',
+    result:''
   }
 
 

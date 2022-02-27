@@ -13,8 +13,8 @@ class adController {
         }
     }
     async findAll(ctx){
-        const {space_id} = ctx.request.query
-        const res = await findAdvertisements(space_id)
+        // const {spaceId} = ctx.request.query
+        const res = await findAdvertisements(1)
         console.log(res);
         ctx.body = {
             code:0,

@@ -90,21 +90,24 @@ class GoodController {
     }
   }
   async restore(ctx) {}
-  async findAll(ctx) {
-    try {
-      // 1.解析pageNum和pageSize
-      const { pageNum = 1, pageSize = 10 } = ctx.request.query;
-      // 2.调用数据处理的相关方法
-      const res = await findGoods(pageNum, pageSize);
-      // 3. 返回结果
-      ctx.body = {
-        code: 0,
-        message: "获取商品列表成功",
-        result: res,
-      };
-    } catch (error) {
-      console.error(error);
-      return ctx.app.emit("error", findGoodsParamsError, ctx);
+ findAll=({searchAll=false})=> {
+    console.log(searchAll);
+    return async (ctx) =>{
+      try {
+        // 1.解析pageNum和pageSize
+        const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+        // 2.调用数据处理的相关方法
+        const res = await findGoods(pageNum, pageSize ,searchAll);
+        // 3. 返回结果
+        ctx.body = {
+          code: 0,
+          message: "获取商品列表成功",
+          result: res,
+        };
+      } catch (error) {
+        console.error(error);
+        return ctx.app.emit("error", findGoodsParamsError, ctx);
+      }
     }
   }
 }

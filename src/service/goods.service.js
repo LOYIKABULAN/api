@@ -19,7 +19,7 @@ class GoodsService {
     const res = await Goods.restore({ where: { id } });
     return res > 0 ? true : false;
   }
-  async findGoods(pageNum, pageSize) {
+  async findGoods(pageNum, pageSize,searchAll) {
     //1.获取总数
     // const count = await Goods.count();
     // console.log(count);
@@ -40,7 +40,7 @@ class GoodsService {
     const { count, rows } = await Goods.findAndCountAll({
       offset,
       limit: pageSize * 1,
-      paranoid: false,
+      paranoid: searchAll,
     });
     return {
       pageNum,

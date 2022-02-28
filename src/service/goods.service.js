@@ -1,5 +1,6 @@
 // @ts-nocheck
 const Goods = require("../model/goods.model");
+const User = require("../model/user.model");
 class GoodsService {
   async createGoods(goods) {
     const res = await Goods.create(goods);
@@ -38,9 +39,16 @@ class GoodsService {
     // }
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await Goods.findAndCountAll({
+      attributes:['id',"goods_name","goods_price","goods_num","goods_image"],
       offset,
       limit: pageSize * 1,
       paranoid: searchAll,
+      include:{
+        model: User,
+        as:'user_info',
+        attributes:['user_name',"avatar"]
+
+      }
     });
     return {
       pageNum,

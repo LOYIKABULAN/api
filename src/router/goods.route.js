@@ -18,7 +18,7 @@ router.post("/upload", auth, hadAdminPermission, uploadImg);
 // router.post('/upload',uploadImg)
 
 //发布商品接口
-router.post("/", auth, hadAdminPermission, validator, create);
+router.post("/", auth, validator, create);
 
 //修改商品接口
 router.put("/:id", auth, hadAdminPermission, validator, update);

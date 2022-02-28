@@ -22,10 +22,14 @@ class GoodController {
   }
   async create(ctx) {
     //之间调用service 的createGoods方法
+    
     try {
-      const { createdAt, updatedAt, ...res } = await createGoods(
-        ctx.request.body
+      const params = {}
+      Object.assign(params,ctx.request.body,{user_id:ctx.state.user.id})
+      const { createdAt, updatedAt,user_id, ...res } = await createGoods(
+        params
       );
+      
       ctx.body = {
         code: 0,
         message: "发布商品成功",
@@ -91,7 +95,6 @@ class GoodController {
   }
   async restore(ctx) {}
  findAll=({searchAll=false})=> {
-    console.log(searchAll);
     return async (ctx) =>{
       try {
         // 1.解析pageNum和pageSize

@@ -1,8 +1,13 @@
 const {DataTypes} = require('sequelize');
 
 const seq = require('../db/seq')
-
+const User = require('./user.model')
 const Goods = seq.define('zd_good',{
+    user_id:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        comment:'谁发布的信息'
+    },
     goods_name:{
         type:DataTypes.STRING,
         allowNull:false,
@@ -28,7 +33,10 @@ const Goods = seq.define('zd_good',{
     paranoid:true
 }
 )
-
+Goods.belongsTo(User,{
+    foreignKey:'user_id',
+    as:"user_info"
+  })
 // ! 创建新表覆盖之前的旧表数据清空
 // Goods.sync({force:true}); 
 

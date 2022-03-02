@@ -7,9 +7,8 @@ class adController {
         ctx.body = {
             code:0,
             message:'广告添加成功',
-            result:{
-                res
-            }
+            result:res
+            
         }
     }
     async findAll(ctx){

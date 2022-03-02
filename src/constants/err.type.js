@@ -106,7 +106,12 @@ module.exports = {
   },
   deleteAdError:{
     code:'10601',
-    message:'删除失败',
+    message:'广告删除失败',
+    result:''
+  },
+  deleteNewsError:{
+    code:'10701',
+    message:'新闻删除失败',
     result:''
   }
 

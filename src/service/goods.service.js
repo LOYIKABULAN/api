@@ -39,7 +39,6 @@ class GoodsService {
     // }
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await Goods.findAndCountAll({
-      attributes:['id',"goods_name","goods_price","goods_num","goods_image"],
       offset,
       limit: pageSize * 1,
       paranoid: searchAll,

@@ -15,12 +15,12 @@ const Goods = seq.define('zd_good',{
     },
     goods_price:{
         type:DataTypes.DECIMAL(10,2),//十位数，末尾保持两个小数
-        allowNull:false,
+        allowNull:true,
         comment:'商品价格'
     },
     goods_num:{
         type:DataTypes.INTEGER,
-        allowNull:false,
+        allowNull:true,
         comment:'商品的库存'
     },
     goods_image:{
@@ -28,6 +28,11 @@ const Goods = seq.define('zd_good',{
         allowNull:false,
         comment:'商品图片的地址'
     },
+    detail:{
+        type:DataTypes.STRING,
+        allowNull:false,
+        comment:'详细情况'
+    }
 
 },{
     paranoid:true

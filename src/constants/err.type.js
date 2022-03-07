@@ -113,6 +113,16 @@ module.exports = {
     code:'10701',
     message:'新闻删除失败',
     result:''
+  },
+  deleteDeviceError:{
+    code:'10701',
+    message:'设备删除失败',
+    result:''
+  },
+  deleteResidentError:{
+    code:'10701',
+    message:'居民信息删除失败',
+    result:''
   }
 
 

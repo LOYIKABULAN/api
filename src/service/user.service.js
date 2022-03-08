@@ -21,12 +21,13 @@ class UserService {
     });
     return res ? res.dataValues : null;
   }
-  async updateById({ id, user_name, password, is_admin }) {
+  async updateById({ id, user_name, password, is_admin,avatar}) {
     const whereOpt = { id };
     const newUser = {};
     user_name && Object.assign(newUser,{ user_name });
     password && Object.assign(newUser,{ password });
     is_admin && Object.assign(newUser,{ is_admin });
+    avatar && Object.assign(newUser,{ avatar });
 
     const res = await User.update( newUser ,{where: whereOpt,});
     // console.log(res);

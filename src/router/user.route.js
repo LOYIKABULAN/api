@@ -12,10 +12,10 @@ router.post('/register',userValidator,verifyUser,cryptPassword,register)
 router.post('/login',userValidator,verifyLogin,login)
 
 //修改密码接口
-router.patch('/',auth,cryptPassword,changePassword)
+router.post('/',auth,cryptPassword,changePassword)
 
-router.patch('/changeAvatar',auth,changeAvatar)
-router.patch('/changeUserName',auth,verifyUser,changeUserName)
+router.post('/changeAvatar',auth,changeAvatar)
+router.post('/changeUserName',auth,verifyUser,changeUserName)
 
 
 // 获取用户信息

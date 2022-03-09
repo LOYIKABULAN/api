@@ -22,6 +22,7 @@ const Device = seq.define('zd_Device',{
     handler_state:{
         type:DataTypes.TINYINT,
         allowNull:false,
+        defaultValue:0,
         comment:'????????:0:false;1:true:'
     },
     user_id:{

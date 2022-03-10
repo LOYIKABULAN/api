@@ -14,6 +14,7 @@ const {
   removeGoods,
   restoreGoods,
   findGoods,
+  findMyGoods
 } = require("../service/goods.service");
 class GoodController {
   //upload其实可以作为工具单独工具上传多种文件
@@ -22,14 +23,14 @@ class GoodController {
   }
   async create(ctx) {
     //之间调用service 的createGoods方法
-    
+
     try {
-      const params = {}
-      Object.assign(params,ctx.request.body,{user_id:ctx.state.user.id})
-      const { createdAt, updatedAt,user_id, ...res } = await createGoods(
+      const params = {};
+      Object.assign(params, ctx.request.body, { user_id: ctx.state.user.id });
+      const { createdAt, updatedAt, user_id, ...res } = await createGoods(
         params
       );
-      
+
       ctx.body = {
         code: 0,
         message: "发布商品成功",
@@ -94,13 +95,13 @@ class GoodController {
     }
   }
   async restore(ctx) {}
- findAll=({searchAll=false})=> {
-    return async (ctx) =>{
+  findAll = ({ searchAll = false }) => {
+    return async (ctx) => {
       try {
         // 1.解析pageNum和pageSize
         const { pageNum = 1, pageSize = 10 } = ctx.request.query;
         // 2.调用数据处理的相关方法
-        const res = await findGoods(pageNum, pageSize ,searchAll);
+        const res = await findGoods(pageNum, pageSize, searchAll);
         // 3. 返回结果
         ctx.body = {
           code: 0,
@@ -111,7 +112,26 @@ class GoodController {
         console.error(error);
         return ctx.app.emit("error", findGoodsParamsError, ctx);
       }
+    };
+  };
+  async findMyAll(ctx) {
+    try {
+      // 1.解析pageNum和pageSize
+      const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+      const user_id = ctx.state.user.id
+      // 2.调用数据处理的相关方法
+      const res = await findMyGoods(pageNum, pageSize,user_id);
+      // 3. 返回结果
+      ctx.body = {
+        code: 0,
+        message: "获取商品列表成功",
+        result: res,
+      };
+    } catch (error) {
+      console.error(error);
+      return ctx.app.emit("error", findGoodsParamsError, ctx);
     }
+
   }
 }
 

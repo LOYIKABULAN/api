@@ -56,6 +56,29 @@ class GoodsService {
       list: rows,
     };
   }
+  async findMyGoods(pageNum,pageSize,user_id){
+    const offset = (pageNum - 1) * pageSize;
+    const { count, rows } = await Goods.findAndCountAll({
+      offset,
+      limit: pageSize * 1,
+      paranoid: true,
+      include:{
+        model: User,
+        as:'user_info',
+        attributes:['user_name',"avatar"]
+
+      },
+      where:{
+        user_id
+      }
+    });
+    return {
+      pageNum,
+      pageSize,
+      total: count,
+      list: rows,
+    };
+  }
 }
 
 module.exports = new GoodsService();

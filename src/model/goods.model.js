@@ -29,7 +29,7 @@ const Goods = seq.define('zd_good',{
         comment:'商品图片的地址'
     },
     detail:{
-        type:DataTypes.STRING,
+        type:DataTypes.JSON,
         allowNull:false,
         comment:'详细情况'
     }

@@ -11,6 +11,7 @@ const {
   update,
   state,
   findAll,
+  findMyAll
 } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
 //商品图片上传接口
@@ -36,4 +37,7 @@ router.post('/:id/state',auth,hadAdminPermission,state)
 
 router.get('/',auth,hadAdminPermission,findAll({searchAll:false}))//获取所有包括下架商品
 router.get('/feeds',findAll({searchAll:true}))
+
+router.get('/feedsPersonal',auth,findMyAll)
+
 module.exports = router;

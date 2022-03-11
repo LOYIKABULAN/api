@@ -15,7 +15,7 @@ const {
 } = require("../controller/goods.controller");
 const { validator } = require("../middleware/goods.middleware");
 //商品图片上传接口
-router.post("/upload", auth, hadAdminPermission, uploadImg);
+router.post("/upload", auth, uploadImg);
 // router.post('/upload',uploadImg)
 
 //发布商品接口

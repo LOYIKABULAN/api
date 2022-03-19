@@ -15,6 +15,9 @@ class deviceService {
       const { count, rows } = await device.findAndCountAll({
         offset,
         limit: pageSize * 1,
+        order:[
+          ['id','DESC']
+        ]
       });
       return {
         pageNum,
@@ -27,6 +30,9 @@ class deviceService {
       const { count, rows } = await device.findAndCountAll({
         offset,
         limit: pageSize * 1,
+        order:[
+          ['id','DESC']
+        ],
         where:{
           user_id
         }

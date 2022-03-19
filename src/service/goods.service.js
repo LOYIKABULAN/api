@@ -47,7 +47,10 @@ class GoodsService {
         as:'user_info',
         attributes:['user_name',"avatar"]
 
-      }
+      },
+      order:[
+        ['id','DESC']
+      ]
     });
     return {
       pageNum,
@@ -70,7 +73,10 @@ class GoodsService {
       },
       where:{
         user_id
-      }
+      },
+      order:[
+        ['id','DESC']
+      ]
     });
     return {
       pageNum,

@@ -13,6 +13,9 @@ class newsService {
         where: {
           user_id,
         },
+        order:[
+          ['id','DESC']
+        ]
       });
       return {
         pageNum,
@@ -25,6 +28,9 @@ class newsService {
         const { count, rows } = await resident.findAndCountAll({
           offset,
           limit: pageSize * 1,
+          order:[
+            ['id','DESC']
+          ]
         });
         return {
           pageNum,

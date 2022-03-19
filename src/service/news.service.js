@@ -8,6 +8,9 @@ class newsService {
     const { count, rows } = await news.findAndCountAll({
       offset,
       limit: pageSize * 1,
+      order:[
+        ['id','DESC']
+      ]
     });
     return {
       pageNum,

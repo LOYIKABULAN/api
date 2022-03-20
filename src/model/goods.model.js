@@ -32,6 +32,11 @@ const Goods = seq.define('zd_good',{
         type:DataTypes.JSON,
         allowNull:false,
         comment:'详细情况'
+    },
+    emit_type:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        comment:'0是商品，1是动态'
     }
 
 },{

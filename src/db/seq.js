@@ -22,5 +22,5 @@ seq
   .catch((err) => {
     console.log("数据库连接失败", err);
   });
-  // seq.sync({ force: true });
+  // seq.sync({ force: true });                                             
 module.exports = seq;

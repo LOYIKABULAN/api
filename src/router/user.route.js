@@ -1,7 +1,7 @@
 // @ts-nocheck
 const Router = require('koa-router')
 const router = new Router({prefix:'/user'});
-const {register,login,changePassword,changeAvatar,changeUserName} =require('../controller/user.controller')
+const {register,login,changePassword,changeAvatar,changeUserName,userInfo} =require('../controller/user.controller')
 const {userValidator,verifyUser,cryptPassword,verifyLogin} =require('../middleware/user.middleware')
 const {auth} =require('../middleware/auth.middleware')
 
@@ -19,11 +19,5 @@ router.post('/changeUserName',auth,verifyUser,changeUserName)
 
 
 // 获取用户信息
-router.get("/info", auth, (ctx) => {
-  ctx.body = {
-    code: 0,
-    message: "获取用户信息成功",
-    result: ctx.state.user,
-  };
-});
+router.get("/info", auth,userInfo);
 module.exports = router

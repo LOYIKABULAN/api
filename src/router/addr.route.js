@@ -37,6 +37,6 @@ router.put('/:id',validator({
 router.delete('/:id',auth,remove)
 
 //3.5设置默认
-router.patch('/:id',auth,setDefault)
+router.post('/:id',auth,setDefault)
 //4. 导出路由
 module.exports = router;

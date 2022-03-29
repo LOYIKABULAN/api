@@ -7,6 +7,11 @@ const order = seq.define("zd_orders", {
     allowNull:false,
     comment:'用户id'
   },
+  salesman_id:{
+    type:DataTypes.INTEGER,
+    allowNull:false,
+    comment:'商品发布用户'
+  },
   address_id:{
       type:DataTypes.INTEGER,
       allowNull:false,

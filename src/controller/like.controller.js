@@ -22,7 +22,7 @@ class LikeController {
        
     }
     async findAll(ctx){
-        let params = ctx.request.body
+        let params = ctx.request.query
         const user_id =ctx.state.user.id
         const res = await findAllLike(params,user_id)
         ctx.body = {

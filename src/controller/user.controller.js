@@ -109,5 +109,22 @@ class UserController {
        };
      }
   }
+  async userInfo(ctx){
+    const id = ctx.query.id
+    console.log(id);
+    if (id) {
+      const res = await getUserInfo({id})
+      return ctx.body = {
+        code:0,
+        message:'获取用户信息成功',
+        result:res
+      }
+    }
+    return ctx.body={
+      code:0,
+      message:'获取用户信息成功',
+      result:ctx.state.user
+    }
+  }
 }
 module.exports = new UserController();

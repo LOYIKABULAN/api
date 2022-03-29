@@ -6,12 +6,12 @@ const Goods = seq.define('zd_good',{
     user_id:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        comment:'谁发布的信息'
+        comment:'发布信息的作者'
     },
     goods_name:{
         type:DataTypes.STRING,
         allowNull:false,
-        comment:'商品名称'
+        comment:'商品/动态名称'
     },
     goods_price:{
         type:DataTypes.DECIMAL(10,2),//十位数，末尾保持两个小数
@@ -26,7 +26,7 @@ const Goods = seq.define('zd_good',{
     goods_image:{
         type:DataTypes.STRING,
         allowNull:false,
-        comment:'商品图片的地址'
+        comment:'封面图片的地址'
     },
     detail:{
         type:DataTypes.JSON,

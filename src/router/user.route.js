@@ -1,14 +1,15 @@
 // @ts-nocheck
 const Router = require('koa-router')
 const router = new Router({prefix:'/user'});
-const {register,login,changePassword,changeAvatar,changeUserName,userInfo} =require('../controller/user.controller')
+const {register,login,changePassword,changeAvatar,
+    changeUserName,userInfo,createUser,getUser,changePower} =require('../controller/user.controller')
 const {userValidator,verifyUser,cryptPassword,verifyLogin} =require('../middleware/user.middleware')
-const {auth} =require('../middleware/auth.middleware')
+const {auth, hadAdminPermission} =require('../middleware/auth.middleware')
 
 //注册接口
 router.post('/register',userValidator,verifyUser,cryptPassword,register)
 //创建用户接口
-router.post('/createUser',auth,userValidator,verifyUser,cryptPassword,register)
+router.post('/createUser',auth,hadAdminPermission,userValidator,verifyUser,cryptPassword,createUser)
 
 //登录接口
 router.post('/login',userValidator,verifyLogin,login)
@@ -22,4 +23,11 @@ router.post('/changeUserName',auth,verifyUser,changeUserName)
 
 // 获取用户信息
 router.get("/info", auth,userInfo);
+
+// getAllUser
+router.get("/getAllUser",auth,hadAdminPermission,getUser)
+
+//更改用户权限角色
+router.patch("/userPower",auth,hadAdminPermission,changePower)
+
 module.exports = router

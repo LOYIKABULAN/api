@@ -4,6 +4,7 @@ const {
   createUser,
   getUserInfo,
   updateById,
+  getAllUser,
 } = require("../service/user.service");
 const { JWT_SECRET } = require("../config/config.default");
 class UserController {
@@ -24,7 +25,27 @@ class UserController {
         },
       };
     } catch (error) {
-      console.log(error,'注册错误');
+      console.log(error, "注册错误");
+    }
+  }
+  async createUser(ctx, next) {
+    //1.获取数据
+    const { user_name, password = 123456, is_admin, roles } = ctx.request.body;
+
+    //2.操作数据库
+    try {
+      const res = await createUser(user_name, password, is_admin, roles);
+      //3. 返回结果
+      ctx.body = {
+        code: 0,
+        message: "创建用户成功",
+        result: {
+          id: res.id,
+          user_name: res.user_name,
+        },
+      };
+    } catch (error) {
+      console.log(error, "创建用户错误");
     }
   }
   async login(ctx, next) {
@@ -85,39 +106,76 @@ class UserController {
     }
   }
   async changeUserName(ctx) {
-     //1.获取数据
-     const id = ctx.state.user.id;
-     const user_name = ctx.request.body.user_name;
-     //2.操作数据库
-     //3.返回结束
-     if (await updateById({ id, user_name })) {
-       ctx.body = {
-         code: 0,
-         message: "修改用户名成功",
-         result: "",
-       };
-     } else {
-       ctx.body = {
-         code: 10011,
-         message: "修改用户名失败",
-         result: "",
-       };
-     }
-  }
-  async userInfo(ctx){
-    const id = ctx.query.id
-    if (id) {
-      const res = await getUserInfo({id})
-      return ctx.body = {
-        code:0,
-        message:'获取用户信息成功',
-        result:res
-      }
+    //1.获取数据
+    const id = ctx.state.user.id;
+    const user_name = ctx.request.body.user_name;
+    //2.操作数据库
+    //3.返回结束
+    if (await updateById({ id, user_name })) {
+      ctx.body = {
+        code: 0,
+        message: "修改用户名成功",
+        result: "",
+      };
+    } else {
+      ctx.body = {
+        code: 10011,
+        message: "修改用户名失败",
+        result: "",
+      };
     }
-    return ctx.body={
-      code:0,
-      message:'获取用户信息成功1',
-      result:ctx.state.user
+  }
+  async changePower(ctx) {
+    //1.获取数据
+    const {id,is_admin,roles} = ctx.request.body;
+    //2.操作数据库
+    //3.返回结束
+    if (await updateById({ id, is_admin,roles })) {
+      ctx.body = {
+        code: 0,
+        message: "修改权限成功",
+        result: "",
+      };
+    } else {
+      ctx.body = {
+        code: 10011,
+        message: "修改权限失败",
+        result: "",
+      };
+    }
+  }
+  async userInfo(ctx) {
+    const id = ctx.query.id;
+    if (id) {
+      const res = await getUserInfo({ id });
+      return (ctx.body = {
+        code: 0,
+        message: "获取用户信息成功",
+        result: res,
+      });
+    }
+    return (ctx.body = {
+      code: 0,
+      message: "获取用户信息成功1",
+      result: ctx.state.user,
+    });
+  }
+  async getUser(ctx) {
+    try {
+      const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+      const res = await getAllUser({ pageNum,pageSize });
+      return ctx.body = {
+        code: 0,
+        message: "获取用户信息成功",
+        result: res,
+      };
+    } catch (error) {
+      console.error(error,'查找用户');
+      return ctx.body = {
+        code: 12202,
+        message: "查找用户失败",
+        result: res,
+      };
     }
   }
 }

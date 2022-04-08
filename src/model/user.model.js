@@ -32,7 +32,7 @@ const User = seq.define('zd_user',{
     roles:{
         type:DataTypes.JSON,
         allowNull:false,
-        defaultValue:'["user"]',
+        defaultValue:["user"],
         comment:'用户身份,0:普通用户;1:审核员;2:管理员;3:超级管理员'
     }
 },{

@@ -1,7 +1,6 @@
 const device = require("../model/device.model");
 class deviceService {
   async createDevice(params) {
-    console.log(params);
     try {
      return await device.create(params);
       

@@ -37,7 +37,7 @@ class CommentController {
                 return
             }
         } catch (error) {
-            console.log(error);
+            console.log(error,'评论错误');
             ctx.body = {
                 code :12202,
                 message:'错误',
@@ -52,7 +52,6 @@ class CommentController {
         const id = ctx.request.params.id
         const params = ctx.request.body
         const res = await updateComment(id,params)
-        console.log(res);
         ctx.body = {
             code:0,
             message:'更新成功',

@@ -4,10 +4,12 @@ class addrService {
   async createAddr(params) {
     return await Address.create(params);
   }
-  async findAllAddr(user_id) {
+  async findAllAddr({user_id,id}) {
+    let whereObj = {user_id}
+    id && Object.assign(whereObj,{id:id*1})
     return await Address.findAll({
       attributes: ["id", "consignee", "phone", "address", "is_default"],
-      where: { user_id },
+      where:whereObj,
     });
   }
   async updateAddr(id, addr) {
@@ -21,7 +23,6 @@ class addrService {
     });
   }
   async setDefaultAddr({ id, user_id }) {
-      console.log(id,user_id);
     await Address.update({ is_default: false }, { where: { user_id } });
     return await Address.update(
       { is_default: true },

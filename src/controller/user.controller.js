@@ -9,13 +9,11 @@ const { JWT_SECRET } = require("../config/config.default");
 class UserController {
   async register(ctx, next) {
     //1.获取数据
-    // console.log(ctx.request.body);
     const { user_name, password } = ctx.request.body;
 
     //2.操作数据库
     try {
       const res = await createUser(user_name, password);
-      console.log(res);
       //3. 返回结果
       ctx.body = {
         code: 0,
@@ -26,7 +24,7 @@ class UserController {
         },
       };
     } catch (error) {
-      console.log(error);
+      console.log(error,'注册错误');
     }
   }
   async login(ctx, next) {
@@ -50,7 +48,6 @@ class UserController {
     //1.获取数据
     const id = ctx.state.user.id;
     const password = ctx.request.body.password;
-    // console.log(id,password);
     //2.操作数据库
     //3.返回结束
     if (await updateById({ id, password })) {
@@ -71,7 +68,6 @@ class UserController {
     //1.获取数据
     const id = ctx.state.user.id;
     const avatar = ctx.request.body.avatar;
-    // console.log(id,password);
     //2.操作数据库
     //3.返回结束
     if (await updateById({ id, avatar })) {
@@ -92,7 +88,6 @@ class UserController {
      //1.获取数据
      const id = ctx.state.user.id;
      const user_name = ctx.request.body.user_name;
-     // console.log(id,password);
      //2.操作数据库
      //3.返回结束
      if (await updateById({ id, user_name })) {
@@ -111,7 +106,6 @@ class UserController {
   }
   async userInfo(ctx){
     const id = ctx.query.id
-    console.log(id);
     if (id) {
       const res = await getUserInfo({id})
       return ctx.body = {
@@ -122,7 +116,7 @@ class UserController {
     }
     return ctx.body={
       code:0,
-      message:'获取用户信息成功',
+      message:'获取用户信息成功1',
       result:ctx.state.user
     }
   }

@@ -18,7 +18,8 @@ class addrController {
   }
   async findAll(ctx) {
     const user_id = ctx.state.user.id;
-    const res = await findAllAddr(user_id);
+    const {id} = ctx.request.query
+    const res = await findAllAddr({user_id,id});
     ctx.body = {
       code: 0,
       message: "查找地址成功",

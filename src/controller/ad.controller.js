@@ -14,7 +14,6 @@ class adController {
     async findAll(ctx){
         // const {spaceId} = ctx.request.query
         const res = await findAdvertisements(1)
-        console.log(res);
         ctx.body = {
             code:0,
             message:'获取列表成功',
@@ -24,7 +23,6 @@ class adController {
     async deleted(ctx){
         const id = ctx.request.params.id
         const res = await deleteAd(id)
-        console.log(res);
         if (res) {
             ctx.body = {
                 code :0,

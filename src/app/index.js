@@ -14,7 +14,6 @@ const app = new Koa();
 app.use(cors());
 const router = require("../router");
 const errHandler = require("./errHandler");
-// console.log(process.cwd());
 app.use(
   koaBody({
     multipart: true, //Parse multipart bodies, default false

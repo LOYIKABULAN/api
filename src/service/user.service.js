@@ -4,7 +4,6 @@ class UserService {
   async createUser(user_name, password) {
     // 写入数据库
     const res = await User.create({ user_name, password }); //可以使用try catch 来解决报错
-    // console.log(res);
     return res.dataValues;
   }
   async getUserInfo({ id, user_name, password, is_admin }) {
@@ -16,7 +15,7 @@ class UserService {
     is_admin && Object.assign(whereOpt, { is_admin });
 
     const res = await User.findOne({
-      attributes: ["id", "user_name", "password", "is_admin","avatar"],
+      attributes: ["id", "user_name", "password", "is_admin","avatar","roles"],
       where: whereOpt,
     });
     return res ? res.dataValues : null;
@@ -30,7 +29,6 @@ class UserService {
     avatar && Object.assign(newUser,{ avatar });
 
     const res = await User.update( newUser ,{where: whereOpt,});
-    // console.log(res);
     return res[0] > 0 ? true:false
   }
 }

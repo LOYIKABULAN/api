@@ -7,6 +7,8 @@ const {auth} =require('../middleware/auth.middleware')
 
 //注册接口
 router.post('/register',userValidator,verifyUser,cryptPassword,register)
+//创建用户接口
+router.post('/createUser',auth,userValidator,verifyUser,cryptPassword,register)
 
 //登录接口
 router.post('/login',userValidator,verifyLogin,login)

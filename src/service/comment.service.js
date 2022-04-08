@@ -10,7 +10,6 @@ class commentService {
     }
   }
   async findComment({pageNum,pageSize,goods_id}) {
-    console.log(goods_id);
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await comment.findAndCountAll({
       offset,
@@ -30,7 +29,6 @@ class commentService {
     };
   }
   async deleteComment({id}) {
-    console.log(id);
     return comment.destroy({
       where: {
         id,

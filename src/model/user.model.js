@@ -29,10 +29,10 @@ const User = seq.define('zd_user',{
         defaultValue:0,
         Comment:'是否为管理员，0：不是管理员（默认）；1：是管理员'
     },
-    role:{
-        type:DataTypes.INTEGER,
+    roles:{
+        type:DataTypes.JSON,
         allowNull:false,
-        defaultValue:0,
+        defaultValue:'["user"]',
         comment:'用户身份,0:普通用户;1:审核员;2:管理员;3:超级管理员'
     }
 },{

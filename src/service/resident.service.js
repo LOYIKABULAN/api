@@ -4,7 +4,6 @@ class newsService {
     return resident.create(params);
   }
   async findResident({ pageNum, pageSize, user_id, is_user }) {
-    console.log(user_id, is_user);
     if (is_user) {
       const offset = (pageNum - 1) * pageSize;
       const { count, rows } = await resident.findAndCountAll({

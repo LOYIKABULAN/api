@@ -1,4 +1,7 @@
 const order = require("../model/order.model");
+const Address = require("../model/addr.model");
+const User = require("../model/user.model");
+
 class orderService {
   async createOrder(params) {
     return await order.create(params);
@@ -40,7 +43,6 @@ class orderService {
     };
   }
   async updateOrder(id, states) {
-    console.log("hh");
     return await order.update({ states }, { where: { id } });
   }
 }

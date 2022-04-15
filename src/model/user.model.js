@@ -33,7 +33,7 @@ const User = seq.define('zd_user',{
         type:DataTypes.JSON,
         allowNull:false,
         defaultValue:["user"],
-        comment:'用户身份,0:普通用户;1:审核员;2:管理员;3:超级管理员'
+        comment:'用户身份'
     }
 },{
     timestamps:true//false 是时候默认不创建时间更新时间如上传时间

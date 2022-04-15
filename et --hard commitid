@@ -1,0 +1,188 @@
+[33mcommit affa49a180a0eedb937ca162ecc2d306234687a9[m[33m ([m[1;36mHEAD -> [m[1;32mback_test[m[33m, [m[1;31morigin/back_test[m[33m, [m[1;32m商品模块[m[33m)[m
+Author: guankaihua <876224752@qq.com>
+Date:   Fri Apr 8 18:04:55 2022 +0800
+
+    用户管理接口
+
+ src/controller/user.controller.js | 120 [32m++++++++++++++++++++++++++++[m[31m----------[m
+ src/model/user.model.js           |   2 [32m+[m[31m-[m
+ src/router/user.route.js          |  14 [32m++++[m[31m-[m
+ src/service/user.service.js       |  35 [32m+++++++++[m[31m--[m
+ 4 files changed, 132 insertions(+), 39 deletions(-)
+
+[33mcommit a6b23f12dd115f864c3f2377fd5c724eecb5b0da[m
+Author: guankaihua <876224752@qq.com>
+Date:   Fri Apr 8 09:11:47 2022 +0800
+
+    优化代码
+
+ .env                                                   |  12 [32m++++++++[m[31m----[m
+ src/app/index.js                                       |   1 [31m-[m
+ src/config/config.default.js                           |   1 [31m-[m
+ src/controller/ad.controller.js                        |   2 [31m--[m
+ src/controller/addr.controller.js                      |   3 [32m++[m[31m-[m
+ src/controller/cart.controller.js                      |   1 [31m-[m
+ src/controller/comment.controller.js                   |   3 [32m+[m[31m--[m
+ src/controller/user.controller.js                      |  10 [32m++[m[31m--------[m
+ src/model/user.model.js                                |   6 [32m+++[m[31m---[m
+ src/router/user.route.js                               |   2 [32m++[m
+ src/service/addr.service.js                            |   7 [32m++++[m[31m---[m
+ src/service/comment.service.js                         |   2 [31m--[m
+ src/service/device.service.js                          |   1 [31m-[m
+ src/service/order.service.js                           |   4 [32m+++[m[31m-[m
+ src/service/resident.service.js                        |   1 [31m-[m
+ src/service/user.service.js                            |   4 [32m+[m[31m---[m
+ src/upload/upload_78b26c68e6f154170315c161a88075a9.png | Bin [31m0[m -> [32m3289[m bytes
+ 17 files changed, 26 insertions(+), 34 deletions(-)
+
+[33mcommit 2b10d5e8de3e152bc202d97e22710dbd5c712cc3[m[33m ([m[1;31morigin/商品模块[m[33m)[m
+Author: guankaihua <876224752@qq.com>
+Date:   Wed Mar 30 00:18:01 2022 +0800
+
+    完善评论购物点赞
+
+ client/client-1.py                  |    14 [32m+[m
+ loadtest/loadtest-1.py              |    13 [32m+[m
+ loadtest/loadtest-2.py              |     1 [32m+[m
+ log/2022-03-24_14.31.43.log         | 10852 [32m++++++++++++++++++++++++++++++++++[m
+ log/2022-03-24_15.44.42.log         |    10 [32m+[m
+ log/2022-03-24_16.15.14.log         |    23 [32m+[m
+ log/2022-03-24_16.34.56.log         |     2 [32m+[m
+ log/2022-03-24_19.40.34.log         |   461 [32m++[m
+ log/2022-03-24_19.41.09.log         |   782 [32m+++[m
+ log/2022-03-25_01.01.41.log         |     8 [32m+[m
+ log/2022-03-25_01.14.39.log         |  1069 [32m++++[m
+ log/2022-03-25_01.17.51.log         |     3 [32m+[m
+ log/2022-03-25_02.03.21.log         |    10 [32m+[m
+ log/2022-03-25_02.04.16.log         |     4 [32m+[m
+ log/2022-03-25_02.09.56.log         |  1536 [32m+++++[m
+ log/2022-03-25_02.13.56.log         |    92 [32m+[m
+ log/2022-03-25_13.32.56.log         |     5 [32m+[m
+ log/2022-03-25_13.35.33.log         |     4 [32m+[m
+ log/2022-03-25_13.55.42.log         |   206 [32m+[m
+ log/2022-03-25_13.58.22.log         |     6 [32m+[m
+ log/2022-03-25_14.05.22.log         |   296 [32m+[m
+ log/2022-03-25_14.15.13.log         |    16 [32m+[m
+ log/2022-03-25_14.37.42.log         |  3017 [32m++++++++++[m
+ log/2022-03-25_15.16.12.log         |  4082 [32m+++++++++++++[m
+ pconf.json                          |     6 [32m+[m
+ run_client.py                       |    24 [32m+[m
+ run_loadtest.py                     |    92 [32m+[m
+ src/controller/like.controller.js   |     2 [32m+[m[31m-[m
+ src/controller/order.constroller.js |    36 [32m+[m[31m-[m
+ src/controller/user.controller.js   |    17 [32m+[m
+ src/model/goods.model.js            |     6 [32m+[m[31m-[m
+ src/model/order.model.js            |     5 [32m+[m
+ src/router/addr.route.js            |     2 [32m+[m[31m-[m
+ src/router/order.route.js           |     6 [32m+[m[31m-[m
+ src/router/user.route.js            |    10 [32m+[m[31m-[m
+ src/service/order.service.js        |    26 [32m+[m[31m-[m
+ stats_perf/2022-3-25_14.37.29.sts   |    24 [32m+[m
+ 37 files changed, 22740 insertions(+), 28 deletions(-)
+
+[33mcommit 10ec710cb5abe59797dbe2ecdc835fcb55197ca3[m
+Author: guankaihua <876224752@qq.com>
+Date:   Sun Mar 20 12:14:45 2022 +0800
+
+    提交点赞评论
+
+ src/controller/comment.controller.js | 64 [32m++++++++++++++++++++++++++++++++++++[m
+ src/controller/like.controller.js    | 37 [32m+++++++++++++++++++++[m
+ src/db/seq.js                        |  2 [32m+[m[31m-[m
+ src/model/comment.model.js           | 31 [32m+++++++++++++++++[m
+ src/model/goods.model.js             |  5 [32m+++[m
+ src/model/like.model.js              | 22 [32m+++++++++++++[m
+ src/model/user.model.js              |  6 [32m++++[m
+ src/router/comment.router.js         | 15 [32m+++++++++[m
+ src/router/like.router.js            | 12 [32m+++++++[m
+ src/service/comment.service.js       | 47 [32m++++++++++++++++++++++++++[m
+ src/service/like.service.js          | 42 [32m+++++++++++++++++++++++[m
+ 11 files changed, 282 insertions(+), 1 deletion(-)
+
+[33mcommit f4b8483951632e3b6356c613ad6010b30841f742[m
+Author: guankaihua <876224752@qq.com>
+Date:   Sat Mar 19 20:19:31 2022 +0800
+
+    查询结果按id来
+
+ .env                            |  4 [32m++[m[31m--[m
+ src/service/device.service.js   |  6 [32m++++++[m
+ src/service/goods.service.js    | 10 [32m++++++++[m[31m--[m
+ src/service/news.service.js     |  3 [32m+++[m
+ src/service/resident.service.js |  6 [32m++++++[m
+ 5 files changed, 25 insertions(+), 4 deletions(-)
+
+[33mcommit d86828deeb986c0370a02a04c2e57e7df296022d[m
+Author: guankaihua <876224752@qq.com>
+Date:   Fri Mar 11 21:51:42 2022 +0800
+
+    取消上传图片用户权限
+
+ src/router/goods.route.js | 2 [32m+[m[31m-[m
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+[33mcommit ddd180a564cfa7b4f7a058426fabf2fcd71ffaf5[m
+Author: guankaihua <876224752@qq.com>
+Date:   Thu Mar 10 21:26:02 2022 +0800
+
+    删除本地图片
+
+ .../upload_0316b191fea9262a5ff521cac78dc944.jpg      | Bin [31m7134[m -> [32m0[m bytes
+ .../upload_0ab5c1bbdd3fd15f0a859a68142ff284.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_0b2bf1af15e129635e0423719206fbe7.png      | Bin [31m414717[m -> [32m0[m bytes
+ .../upload_11de0f4e0d802124c3973171921ff967.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_1bdd01a0797d3c017ddb057bfed13849.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_1dadd98bd94170cebdb8d10891106806.jpg      | Bin [31m442225[m -> [32m0[m bytes
+ .../upload_204e6f010f290df589f63aafe313b0ee.jpg      | Bin [31m13735[m -> [32m0[m bytes
+ .../upload_2525724aeb156dcba3d3e9fe2718b29f.png      | Bin [31m414717[m -> [32m0[m bytes
+ .../upload_2daaa0e8a77cb086c928a4f5a8a4dfe2.png      | Bin [31m414717[m -> [32m0[m bytes
+ .../upload_34a26040884fdf5877b951b2712e4f8d.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_41ed96834be7820eb4dda10e4aa242f9.png      | Bin [31m161827[m -> [32m0[m bytes
+ .../upload_42f172dcd93cb07e91cff916b1d48d77.png      | Bin [31m414717[m -> [32m0[m bytes
+ .../upload_444c020796b98b3a842121cfc66f6ded.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_4beedbd4494a91f70728534b76ae79f3.png      | Bin [31m161827[m -> [32m0[m bytes
+ .../upload_4c67967a479b5559a3a391d373a90db8.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_5f280a41cac0e8fa05754a6720817a02.jpg      | Bin [31m442225[m -> [32m0[m bytes
+ .../upload_60dee76c98a2f68e5f42a320417b7a0c.png      | Bin [31m414717[m -> [32m0[m bytes
+ .../upload_a6e8788245453afeda9717a06dcfd4d4.jpg      | Bin [31m12865809[m -> [32m0[m bytes
+ .../upload_a7c870619b667bceec05ab5940f6cc40.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_acd9b412c8ab6baa5df6a76b50a1c0c4.png      | Bin [31m8112[m -> [32m0[m bytes
+ .../upload_af9fa27e06f925ebe7ccdb579762a3e5.png      | Bin [31m5658[m -> [32m0[m bytes
+ .../upload_c33ebe9d21aaee3853f2ab2a06b6ba58.png      | Bin [31m58304[m -> [32m0[m bytes
+ .../upload_c83802e704994c3c7988090267d7592f.jpg      | Bin [31m103983[m -> [32m0[m bytes
+ .../upload_d22852dd68c9c361fa12c992c9870cb2.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_d4e13f340a63a331155bf9f4a55cd43f.jpg      | Bin [31m7134[m -> [32m0[m bytes
+ .../upload_e8ba28147cb7a90e1f0dff974a96d02e.png      | Bin [31m42987[m -> [32m0[m bytes
+ .../upload_eb105f6b356198c0c6cfe65d82fa508f.jpg      | Bin [31m103983[m -> [32m0[m bytes
+ .../upload_ed6eb22b66b5bb72b1748151b3ea6c45.png      | Bin [31m414717[m -> [32m0[m bytes
+ 28 files changed, 0 insertions(+), 0 deletions(-)
+
+[33mcommit 7a7728c81fb6585a5b6c4764fb26b00cfadfa189[m
+Author: guankaihua <876224752@qq.com>
+Date:   Thu Mar 10 21:25:19 2022 +0800
+
+    添加服务器地址
+
+ .env | 3 [32m++[m[31m-[m
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+[33mcommit f1db1557fcd87257a710281aa464010e68dec20d[m
+Author: guankaihua <876224752@qq.com>
+Date:   Thu Mar 10 14:28:29 2022 +0800
+
+    完善上传
+
+ src/controller/goods.controller.js                 |  36 [32m++++++++++++++++[m[31m-----[m
+ src/model/goods.model.js                           |   2 [32m+[m[31m-[m
+ src/router/goods.route.js                          |   4 [32m+++[m
+ src/service/goods.service.js                       |  23 [32m+++++++++++++[m
+ .../upload_0316b191fea9262a5ff521cac78dc944.jpg    | Bin [31m0[m -> [32m7134[m bytes
+ .../upload_1dadd98bd94170cebdb8d10891106806.jpg    | Bin [31m0[m -> [32m442225[m bytes
+ .../upload_2daaa0e8a77cb086c928a4f5a8a4dfe2.png    | Bin [31m0[m -> [32m414717[m bytes
+ .../upload_41ed96834be7820eb4dda10e4aa242f9.png    | Bin [31m0[m -> [32m161827[m bytes
+ .../upload_5f280a41cac0e8fa05754a6720817a02.jpg    | Bin [31m0[m -> [32m442225[m bytes
+ .../upload_af9fa27e06f925ebe7ccdb579762a3e5.png    | Bin [31m0[m -> [32m5658[m bytes
+ .../upload_c33ebe9d21aaee3853f2ab2a06b6ba58.png    | Bin [31m0[m -> [32m58304[m bytes
+ .../upload_eb105f6b356198c0c6cfe65d82fa508f.jpg    | Bin [31m0[m -> [32m103983[m bytes
+ .../upload_ed6eb22b66b5bb72b1748151b3ea6c45.png    | Bin [31m0[m -> [32m414717[m bytes
+ 13 files changed, 56 insertions(+), 9 deletions(-)

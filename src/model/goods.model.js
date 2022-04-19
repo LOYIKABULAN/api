@@ -43,6 +43,7 @@ const Goods = seq.define('zd_good',{
     paranoid:true
 }
 )
+//model.js
 Goods.belongsTo(User,{
     foreignKey:'user_id',
     as:"user_info"

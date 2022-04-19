@@ -37,6 +37,7 @@ class GoodsService {
     // } catch (error) {
     //   console.error(error);
     // }
+    //service.js
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await Goods.findAndCountAll({
       offset,

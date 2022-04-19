@@ -4,6 +4,7 @@ const {DataTypes} = require('sequelize')
 
 const seq = require('../db/seq')
 //创建模型（Model zd_user -> zd_users
+
 const User = seq.define('zd_user',{
     //id 会被sequelize 自动创建管理
     user_name:{
@@ -41,5 +42,4 @@ const User = seq.define('zd_user',{
 
 //强制同步数据库（创建数据表）
 // User.sync({force:true})
-
 module.exports = User

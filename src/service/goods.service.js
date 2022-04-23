@@ -1,4 +1,5 @@
 // @ts-nocheck
+const { Op } = require('sequelize')
 const Goods = require("../model/goods.model");
 const User = require("../model/user.model");
 class GoodsService {
@@ -20,29 +21,17 @@ class GoodsService {
     const res = await Goods.restore({ where: { id } });
     return res > 0 ? true : false;
   }
-  async findGoods(pageNum, pageSize,searchAll) {
-    //1.获取总数
-    // const count = await Goods.count();
-    // console.log(count);
-    //2.获取分页的具体数据
-    // try {
-    //   const offset = (pageNum - 1) * pageSize;
-    //   const rows = await Goods.findAll({ offset, limit: pageSize * 1 });
-    //   return {
-    //       pageNum,
-    //       pageSize,
-    //       total:count,
-    //       list:rows
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
-    //service.js
+  async findGoods({pageNum, pageSize,id,goods_name},searchAll) {
+    const whereOpt = {};
+    id && Object.assign(whereOpt,{id});
+    goods_name && Object.assign(whereOpt,{goods_name:{[Op.like]:`%${goods_name}%`}});
+    console.log(whereOpt)
     const offset = (pageNum - 1) * pageSize;
     const { count, rows } = await Goods.findAndCountAll({
       offset,
       limit: pageSize * 1,
       paranoid: searchAll,
+      where:whereOpt,
       include:{
         model: User,
         as:'user_info',

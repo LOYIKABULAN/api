@@ -58,6 +58,13 @@ class UserService {
       list: rows,
     };
   }
+  async deleteUserById(id){
+    return await User.destroy({
+      where:{
+        id
+      }
+    })
+  }
 }
 
 module.exports = new UserService();

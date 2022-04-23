@@ -1,8 +1,7 @@
 // @ts-nocheck
 const Router = require('koa-router')
 const router = new Router({prefix:'/user'});
-const {register,login,changePassword,changeAvatar,
-    changeUserName,userInfo,createUser,getUser,changePower} =require('../controller/user.controller')
+const {register,login,changePassword,changeAvatar,changeUserName,userInfo,createUser,getUser,changePower,deleteUser} =require('../controller/user.controller')
 const {userValidator,verifyUser,cryptPassword,verifyLogin} =require('../middleware/user.middleware')
 const {auth, hadAdminPermission} =require('../middleware/auth.middleware')
 
@@ -29,5 +28,6 @@ router.get("/getAllUser",auth,hadAdminPermission,getUser)
 
 //更改用户权限角色
 router.patch("/userPower",auth,hadAdminPermission,changePower)
+router.delete("/:id",auth,hadAdminPermission,deleteUser)
 
 module.exports = router

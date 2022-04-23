@@ -8,18 +8,19 @@ const {
   findGoodsParamsError,
 } = require("../constants/err.type");
 const { upload } = require("../utils/upload");
+const { store, setRedis, getRedis } = require("../cache/_redis");
 const {
   createGoods,
   updateGoods,
   removeGoods,
   restoreGoods,
   findGoods,
-  findMyGoods
+  findMyGoods,
 } = require("../service/goods.service");
 class GoodController {
   //upload其实可以作为工具单独工具上传多种文件
   async uploadImg(ctx, next) {
-    upload(ctx, next, ["image/jpeg", "image/png"]);
+    upload(ctx, next, ["image/jpeg", "image/png", "image/gif"]);
   }
   async create(ctx) {
     //之间调用service 的createGoods方法
@@ -99,9 +100,20 @@ class GoodController {
     return async (ctx) => {
       try {
         // 1.解析pageNum和pageSize
-        const { pageNum = 1, pageSize = 10 } = ctx.request.query;
+        const {
+          pageNum = 1,
+          pageSize = 10,
+          id,
+          goods_name,
+        } = ctx.request.query;
         // 2.调用数据处理的相关方法
-        const res = await findGoods(pageNum, pageSize, searchAll);
+        const res = await findGoods(
+          { pageNum, pageSize, id, goods_name },
+          searchAll
+        );
+        // await setRedis("pageSize", 2);
+        // const the_pagesize = await getRedis("pageSize");
+        // console.log(the_pagesize);
         // 3. 返回结果
         ctx.body = {
           code: 0,
@@ -118,9 +130,9 @@ class GoodController {
     try {
       // 1.解析pageNum和pageSize
       const { pageNum = 1, pageSize = 10 } = ctx.request.query;
-      const user_id = ctx.state.user.id
+      const user_id = ctx.state.user.id;
       // 2.调用数据处理的相关方法
-      const res = await findMyGoods(pageNum, pageSize,user_id);
+      const res = await findMyGoods(pageNum, pageSize, user_id);
       // 3. 返回结果
       ctx.body = {
         code: 0,
@@ -131,7 +143,6 @@ class GoodController {
       console.error(error);
       return ctx.app.emit("error", findGoodsParamsError, ctx);
     }
-
   }
 }
 

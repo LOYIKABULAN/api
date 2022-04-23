@@ -13,7 +13,7 @@ module.exports = {
       }
       const reader = fs.createReadStream(file.path);
       let filePath =
-        path.join(__dirname, "../upload") + `/${path.basename(file.path)}`;
+        path.join(__dirname, "../upload") + `/${path.basename(file.path)}`;//upload为上传文件目录
       const upStream = fs.createWriteStream(filePath);
       reader.pipe(upStream);
       ctx.body = {

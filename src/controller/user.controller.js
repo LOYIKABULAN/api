@@ -5,8 +5,10 @@ const {
   getUserInfo,
   updateById,
   getAllUser,
+  deleteUserById
 } = require("../service/user.service");
 const { JWT_SECRET } = require("../config/config.default");
+const { query } = require("koa/lib/request");
 class UserController {
   async register(ctx, next) {
     //1.获取数据
@@ -176,6 +178,15 @@ class UserController {
         message: "查找用户失败",
         result: res,
       };
+    }
+  }
+  async deleteUser(ctx){
+    const id = ctx.params.id
+    const res = await deleteUserById(id);
+    ctx.body= {
+      code:0,
+      message:'删除用户成功',
+      result:res
     }
   }
 }
